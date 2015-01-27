@@ -19,8 +19,12 @@ import java.util.Iterator;
  */
 public class HashedIndex implements Index {
 
+    //Debug
+    boolean d = false;
+
     /** The index as a hashtable. */
     private HashMap<String,PostingsList> index = new HashMap<String,PostingsList>();
+    int counter = 0;
 
 
     /**
@@ -30,6 +34,17 @@ public class HashedIndex implements Index {
 	//
 	//  YOUR CODE HERE
 	//
+        
+        //check if key exists
+        //if it exists add tocID to 
+        PostingsList postList = index.get(token);
+        if(postList == null){
+            postList = new PostingsList();
+            index.put(token, postList);
+            counter++;
+            if(counter % 10000 == 0) System.out.println(counter);
+        }
+        postList.add(docID, offset);
     }
 
 
@@ -40,7 +55,7 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
-	return null;
+        return index.keySet().iterator();
     }
 
 
@@ -51,8 +66,22 @@ public class HashedIndex implements Index {
     public PostingsList getPostings( String token ) {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
-	//
-	return null;
+	// //
+ //        if(d){
+ //            System.out.println(index.size());
+ //            System.out.println("Token: " + token);
+ //            System.out.println("PostinList: " + index.get(token));
+ //            System.out.println("Printing all keys!");
+ //            Iterator<String> itr = getDictionary();
+ //            while(itr.hasNext()){
+ //                System.out.println(itr.next());
+ //            }
+
+                
+ //        }
+
+        return index.get(token);
+
     }
 
 
@@ -63,7 +92,9 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
-	return null;
+        String term = query.terms.get(0);
+        return getPostings(term);
+
     }
 
 

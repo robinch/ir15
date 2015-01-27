@@ -9,12 +9,19 @@
 package ir;
 
 import java.io.Serializable;
+import java.util.LinkedList;
 
 public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
-    
+
     public int docID;
     public double score;
+    private LinkedList<Integer> offsets;
 
+    
+    public PostingsEntry(int docID){
+        this.docID = docID;
+        this.offsets = new LinkedList<Integer>(); 
+    }
     /**
      *  PostingsEntries are compared by their score (only relevant 
      *  in ranked retrieval).
@@ -23,13 +30,25 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
      *  descending order.
      */
     public int compareTo( PostingsEntry other ) {
-	return Double.compare( other.score, score );
+        return Double.compare( other.score, score );
     }
 
-    //
-    //  YOUR CODE HERE
-    //
+    
 
+    public LinkedList<Integer> getOffsets(){
+        return offsets;
+    }
+
+    public void add(int offset){
+
+        Integer off = new Integer(offset);
+        if (offsets.size() == 0){
+            offsets.add(off);
+        }
+        else if(!(offsets.getLast().compareTo(off) == 0)){
+            offsets.add(off);
+        }
+    }
 }
 
-    
+

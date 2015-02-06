@@ -34,7 +34,7 @@ public class HashedIndex implements Index {
 	//
 	//  YOUR CODE HERE
 	//
-        
+
         //check if key exists
         //if it exists add tocID to 
         PostingsList postList = index.get(token);
@@ -66,20 +66,7 @@ public class HashedIndex implements Index {
     public PostingsList getPostings( String token ) {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
-	// //
- //        if(d){
- //            System.out.println(index.size());
- //            System.out.println("Token: " + token);
- //            System.out.println("PostinList: " + index.get(token));
- //            System.out.println("Printing all keys!");
- //            Iterator<String> itr = getDictionary();
- //            while(itr.hasNext()){
- //                System.out.println(itr.next());
- //            }
-
-                
- //        }
-
+	// 
         return index.get(token);
 
     }
@@ -92,9 +79,50 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
-        String term = query.terms.get(0);
-        return getPostings(term);
+        int querySize = query.size();
+        if (querySize == 1){
+            return getPostings(query.terms.get(0));
+        }
 
+        // Simple intersection
+        String[] terms = new String[querySize];
+        PostingsList postList = new PostingsList();
+        for(int i = 0; i < querySize; i++){
+            if (i == 0){
+                postList = intersect(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)));
+            }else if(i > 1){
+                postList = intersect(postList, getPostings(query.terms.get(i)));
+            }
+        }
+        return postList;
+    }
+
+    private PostingsList intersect(PostingsList p1, PostingsList p2){
+        // TODO: Use skip-list in PostingsList to improve speed
+
+        PostingsList intersectedList = new PostingsList();
+        int i = 0;
+        int j = 0;
+        int id1;
+        int id2;
+
+        while (i < p1.size() && j < p2.size()){
+            id1 = p1.get(i).docID;
+            id2 = p2.get(j).docID;
+
+            if(id1 == id2){
+                // Only adds 0 as an offset
+                intersectedList.add(id1, 0);
+                // instead of ++ use a skiplist
+                i++;
+                j++;
+            }else if(id1 < id2){
+                i++;
+            }else{
+                j++;
+            }
+        }
+        return intersectedList;
     }
 
 

@@ -40,6 +40,7 @@ public class PostingsList implements Serializable {
             pEntry.add(offset);
         }else{
             list.add(new PostingsEntry(docID));   
+            list.getLast().add(offset);
         }
         
     }

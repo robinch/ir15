@@ -12,6 +12,7 @@ package ir;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 /**
@@ -84,23 +85,37 @@ public class HashedIndex implements Index {
             return getPostings(query.terms.get(0));
         }
 
-        // Simple intersection
+
         String[] terms = new String[querySize];
         PostingsList postList = new PostingsList();
-        for(int i = 0; i < querySize; i++){
-            if (i == 0){
-                postList = intersect(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)));
-            }else if(i > 1){
-                postList = intersect(postList, getPostings(query.terms.get(i)));
+
+        if(queryType == Index.INTERSECTION_QUERY){
+        // Simple intersection   
+            for(int i = 0; i < querySize; i++){
+                if (i == 0){
+                    postList = intersectionQuery(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)));
+                }else if(i > 1){
+                    postList = intersectionQuery(postList, getPostings(query.terms.get(i)));
+                }
             }
+        }
+
+        if(queryType == Index.PHRASE_QUERY){
+            for(int i = 0; i < querySize; i++){
+                if (i == 0){
+                    postList = phraseSeach(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)), i+1);
+                }else if(i > 1){
+                    postList = phraseSeach(postList, getPostings(query.terms.get(i)), i);
+                }
+            }   
         }
         return postList;
     }
 
-    private PostingsList intersect(PostingsList p1, PostingsList p2){
+    private PostingsList intersectionQuery(PostingsList p1, PostingsList p2){
         // TODO: Use skip-list in PostingsList to improve speed
 
-        PostingsList intersectedList = new PostingsList();
+        PostingsList postList = new PostingsList();
         int i = 0;
         int j = 0;
         int id1;
@@ -112,7 +127,7 @@ public class HashedIndex implements Index {
 
             if(id1 == id2){
                 // Only adds 0 as an offset
-                intersectedList.add(id1, 0);
+                postList.add(id1, 0);
                 // instead of ++ use a skiplist
                 i++;
                 j++;
@@ -122,9 +137,59 @@ public class HashedIndex implements Index {
                 j++;
             }
         }
-        return intersectedList;
+        return postList;
     }
 
+
+    private PostingsList phraseSeach(PostingsList p1, PostingsList p2, int offsetDiff){
+        // TODO: Wright the phrase search algorithm
+        PostingsList postList = new PostingsList();
+        // for loops
+        int i = 0;
+        int j = 0;
+        
+
+        int id1;
+        int id2;
+        int k,l;
+        LinkedList<Integer> offsets1;
+        LinkedList<Integer> offsets2;
+        int off1, off2;
+
+        while (i < p1.size() && j < p2.size()){
+            id1 = p1.get(i).docID;
+            id2 = p2.get(j).docID;
+
+            if(id1 == id2){
+                // Do the offset check here
+                k = 0;
+                l = 0;
+                offsets1 = p1.get(i).getOffsets();
+                offsets2 = p2.get(j).getOffsets();
+                while(k < offsets1.size() && l < offsets2.size()){
+                    off1 = offsets1.get(k);
+                    off2 = offsets2.get(l);
+                    if( (off2 - off1) == offsetDiff){
+                        postList.add(id1, off1);
+                        k++;
+                        l++;
+                    }else if(off1 < off2){
+                        k++;
+                    }else{
+                        l++;
+                    }
+                }
+                i++;
+                j++;
+            }else if(id1 < id2){
+                i++;
+            }else{
+                j++;
+            }
+        }
+
+        return postList;
+    }
 
     /**
      *  No need for cleanup in a HashedIndex.

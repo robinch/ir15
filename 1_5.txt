@@ -1,0 +1,15 @@
+Query: monuments
+
+AliPezeshkpour 0
+Art_Department 0
+Lincoln_Highway 1
+Street_Name_Themes 2 // links to monuments etc
+
+precision = 1/2
+recall = 2/1000
+
+
+Query: historical monuments 
+
+
+grep -Eil "\bhistorical\b" $(grep -Eil "\monuments\b" davisWiki/* ) | wc -l

@@ -81,39 +81,46 @@ public class HashedIndex implements Index {
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
         int querySize = query.size();
-        if (querySize == 1){
-            return getPostings(query.terms.get(0));
+        String[] terms = new String[querySize];
+        String s = "";
+        for(int i = 0; i < querySize; i++ ){
+            s = query.terms.get(i).toLowerCase();
+            //if (s.matches("[a-zA-Z0-9]+")) // dont think we need this
+            terms[i] = s;
         }
 
+        
+        if (terms.length == 1){
+            return getPostings(terms[0]);
+        }
 
-        String[] terms = new String[querySize];
         PostingsList postList = new PostingsList();
 
-        if(queryType == Index.INTERSECTION_QUERY){
+        
         // Simple intersection   
-            for(int i = 0; i < querySize; i++){
-                if (i == 0){
-                    postList = intersectionQuery(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)));
-                }else if(i > 1){
-                    postList = intersectionQuery(postList, getPostings(query.terms.get(i)));
-                }
+        for(int i = 0; i < terms.length; i++){
+            if (i == 0){
+                if(queryType == Index.INTERSECTION_QUERY)
+                    postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
+                if(queryType == Index.PHRASE_QUERY)
+                    postList = phraseSeach(getPostings(terms[0]), getPostings(terms[1]), i+1);
+            }else if(i > 1){
+                if(queryType == Index.INTERSECTION_QUERY)
+                    postList = intersectionQuery(postList, getPostings(terms[i]));
+                if(queryType == Index.PHRASE_QUERY)
+                    postList = phraseSeach(postList, getPostings(terms[i]), i);
             }
-        }
-
-        if(queryType == Index.PHRASE_QUERY){
-            for(int i = 0; i < querySize; i++){
-                if (i == 0){
-                    postList = phraseSeach(getPostings(query.terms.get(0)), getPostings(query.terms.get(1)), i+1);
-                }else if(i > 1){
-                    postList = phraseSeach(postList, getPostings(query.terms.get(i)), i);
-                }
-            }   
         }
         return postList;
     }
 
     private PostingsList intersectionQuery(PostingsList p1, PostingsList p2){
         // TODO: Use skip-list in PostingsList to improve speed
+
+
+        if(p1 == null || p2 == null){
+            return null;
+        }
 
         PostingsList postList = new PostingsList();
         int i = 0;
@@ -142,12 +149,16 @@ public class HashedIndex implements Index {
 
 
     private PostingsList phraseSeach(PostingsList p1, PostingsList p2, int offsetDiff){
-        // TODO: Wright the phrase search algorithm
+        
+        if(p1 == null || p2 == null){
+            return null;
+        }
+
         PostingsList postList = new PostingsList();
         // for loops
         int i = 0;
         int j = 0;
-        
+
 
         int id1;
         int id2;

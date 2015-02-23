@@ -80,10 +80,9 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
-        int querySize = query.size();
-        String[] terms = new String[querySize];
+        String[] terms = new String[query.size()];
         String s = "";
-        for(int i = 0; i < querySize; i++ ){
+        for(int i = 0; i < query.size(); i++ ){
             s = query.terms.get(i).toLowerCase();
             //if (s.matches("[a-zA-Z0-9]+")) // dont think we need this
             terms[i] = s;

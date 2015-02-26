@@ -47,6 +47,10 @@ public class PostingsList implements Serializable {
         }
         
     }
+
+    public void add(PostingsEntry pe){
+        list.add(pe);
+    }
 }
 
 

@@ -88,33 +88,41 @@ public class HashedIndex implements Index {
         }
 
         
-        if (terms.length == 1){
-            if(queryType == Index.RANKED_QUERY)
-                return rankedQuery(getPostings(terms[0]));
-            return getPostings(terms[0]);
-        }
+        
 
         PostingsList postList = new PostingsList();
 
         
-        // Simple intersection   
-        for(int i = 0; i < terms.length; i++){
-            if (i == 0){
-                if(queryType == Index.INTERSECTION_QUERY)
-                    postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
-                if(queryType == Index.PHRASE_QUERY)
-                    postList = phraseQuery(getPostings(terms[0]), getPostings(terms[1]), i+1);
-                if(queryType == Index.RANKED_QUERY)
-                    postList = rankedQuery(getPostings(terms[0]), getPostings(terms[i]));
-            }else if(i > 1){
-                if(queryType == Index.INTERSECTION_QUERY)
-                    postList = intersectionQuery(postList, getPostings(terms[i]));
-                if(queryType == Index.PHRASE_QUERY)
-                    postList = phraseQuery(postList, getPostings(terms[i]), i);
-                if(queryType == Index.RANKED_QUERY)
-                    postList = rankedQuery(postList, getPostings(terms[i]));
+        if (terms.length == 1){
+            if(queryType == Index.RANKED_QUERY)
+            {
+                postList = rankedQuery(getPostings(terms[0]));
+            }else{
+                postList = getPostings(terms[0]);
+            }
+        }else {
+            for(int i = 0; i < terms.length; i++){
+                switch(queryType){
+                    case (Index.INTERSECTION_QUERY):
+                        if(i == 0) postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
+                        if(i > 1) postList = intersectionQuery(postList, getPostings(terms[i]));
+                        break;
+                    case (Index.PHRASE_QUERY):
+                        if(i == 0) postList = phraseQuery(getPostings(terms[0]), getPostings(terms[1]), i+1);
+                        if(i > 1) postList = phraseQuery(postList, getPostings(terms[i]), i);
+                        break;
+                    case (Index.RANKED_QUERY):
+                        if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0])), getPostings(terms[1]));
+                        if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]));
+                        break;
+                }
             }
         }
+
+        if (queryType == Index.RANKED_QUERY){
+            Collections.sort(postList.getList());
+        }
+
         return postList;
     }
 
@@ -212,10 +220,10 @@ public class HashedIndex implements Index {
         for (int i = 0; i < pl.size(); i++){
             pe = pl.get(i);
             pe.score = tf_idfScore(pe, pl);
-            postList.getList().add(pe);
+            postList.add(pe);
         }
 
-        Collections.sort(postList.getList());
+        
         return postList;
     }
 
@@ -240,7 +248,37 @@ public class HashedIndex implements Index {
     }
 
     private PostingsList rankedQuery(PostingsList p1, PostingsList p2){
-        return null;
+        p2 = rankedQuery(p2);
+
+        if(p1 == null || p2 == null){
+            return null;
+        }
+
+        PostingsList postList = new PostingsList();
+        int i = 0;
+        int j = 0;
+        PostingsEntry pe1;
+        PostingsEntry pe2;
+
+        while (i < p1.size() && j < p2.size()){
+            pe1 = p1.get(i);
+            pe2 = p2.get(j);
+
+            if(pe1.docID == pe2.docID){
+                PostingsEntry pe = new PostingsEntry(pe1.docID);
+                pe.score = pe1.score + pe2.score;
+                postList.add(pe);               
+                i++;
+                j++;
+            }else if(pe1.docID < pe2.docID){
+                postList.add(pe1);
+                i++;
+            }else{
+                postList.add(pe2);
+                j++;
+            }
+        }
+        return postList;
     }
 
     /**

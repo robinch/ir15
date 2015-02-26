@@ -13,6 +13,8 @@ package ir;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Arrays;
+import java.util.Collections;
 
 
 /**
@@ -25,8 +27,7 @@ public class HashedIndex implements Index {
 
     /** The index as a hashtable. */
     private HashMap<String,PostingsList> index = new HashMap<String,PostingsList>();
-    int counter = 0;
-
+    
 
     /**
      *  Inserts this token in the index.
@@ -34,16 +35,11 @@ public class HashedIndex implements Index {
     public void insert( String token, int docID, int offset ) {
 	//
 	//  YOUR CODE HERE
-	//
-
-        //check if key exists
-        //if it exists add tocID to 
+	//  
         PostingsList postList = index.get(token);
         if(postList == null){
             postList = new PostingsList();
             index.put(token, postList);
-            counter++;
-            if(counter % 10000 == 0) System.out.println(counter);
         }
         postList.add(docID, offset);
     }
@@ -80,6 +76,9 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
+
+
+
         String[] terms = new String[query.size()];
         String s = "";
         for(int i = 0; i < query.size(); i++ ){
@@ -90,6 +89,8 @@ public class HashedIndex implements Index {
 
         
         if (terms.length == 1){
+            if(queryType == Index.RANKED_QUERY)
+                return rankedQuery(getPostings(terms[0]));
             return getPostings(terms[0]);
         }
 
@@ -102,12 +103,16 @@ public class HashedIndex implements Index {
                 if(queryType == Index.INTERSECTION_QUERY)
                     postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
                 if(queryType == Index.PHRASE_QUERY)
-                    postList = phraseSeach(getPostings(terms[0]), getPostings(terms[1]), i+1);
+                    postList = phraseQuery(getPostings(terms[0]), getPostings(terms[1]), i+1);
+                if(queryType == Index.RANKED_QUERY)
+                    postList = rankedQuery(getPostings(terms[0]), getPostings(terms[i]));
             }else if(i > 1){
                 if(queryType == Index.INTERSECTION_QUERY)
                     postList = intersectionQuery(postList, getPostings(terms[i]));
                 if(queryType == Index.PHRASE_QUERY)
-                    postList = phraseSeach(postList, getPostings(terms[i]), i);
+                    postList = phraseQuery(postList, getPostings(terms[i]), i);
+                if(queryType == Index.RANKED_QUERY)
+                    postList = rankedQuery(postList, getPostings(terms[i]));
             }
         }
         return postList;
@@ -115,7 +120,6 @@ public class HashedIndex implements Index {
 
     private PostingsList intersectionQuery(PostingsList p1, PostingsList p2){
         // TODO: Use skip-list in PostingsList to improve speed
-
 
         if(p1 == null || p2 == null){
             return null;
@@ -147,8 +151,8 @@ public class HashedIndex implements Index {
     }
 
 
-    private PostingsList phraseSeach(PostingsList p1, PostingsList p2, int offsetDiff){
-        
+    private PostingsList phraseQuery(PostingsList p1, PostingsList p2, int offsetDiff){
+
         if(p1 == null || p2 == null){
             return null;
         }
@@ -199,6 +203,44 @@ public class HashedIndex implements Index {
         }
 
         return postList;
+    }
+
+
+    private PostingsList rankedQuery(PostingsList pl){
+        PostingsEntry pe;
+        PostingsList postList = new PostingsList();
+        for (int i = 0; i < pl.size(); i++){
+            pe = pl.get(i);
+            pe.score = tf_idfScore(pe, pl);
+            postList.getList().add(pe);
+        }
+
+        Collections.sort(postList.getList());
+        return postList;
+    }
+
+    private double tf_idfScore (PostingsEntry pe, PostingsList pl){
+        /**
+        * t = query term
+        * d = document
+        * 
+        * df = document frequency = # of documents having the term
+        * tf = term frequency = # of occurences of the term in the document
+        * 
+        * tf_idf(d,t) = tf(d,t)*idf(t)/len(d)
+        * idf(t) =  ln(N/df(t))
+        * where tf(d,t) = [# occurrences of t in d], N = [# documents in the corpus],
+        * df(t) = [# documents in the corpus which contain t], and len(d) = [# words in d]. 
+        */
+        int tf = pe.getOffsets().size();
+        double idf = Math.log(Index.docIDs.size()/pl.size());
+        int len = Index.docLengths.get(Integer.toString(pe.docID));
+
+        return tf*idf/len;
+    }
+
+    private PostingsList rankedQuery(PostingsList p1, PostingsList p2){
+        return null;
     }
 
     /**

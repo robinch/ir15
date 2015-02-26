@@ -19,7 +19,6 @@ public class PostingsList implements Serializable {
     /** The postings list as a linked list. */
     private LinkedList<PostingsEntry> list = new LinkedList<PostingsEntry>();
 
-
     /**  Number of postings in this list  */
     public int size() {
         return list.size();
@@ -28,6 +27,10 @@ public class PostingsList implements Serializable {
     /**  Returns the ith posting */
     public PostingsEntry get( int i ) {
         return list.get( i );
+    }
+
+    public LinkedList<PostingsEntry> getList(){
+        return list;
     }
 
     public void add(int docID, int offset){

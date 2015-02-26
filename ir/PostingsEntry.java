@@ -33,8 +33,6 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
         return Double.compare( other.score, score );
     }
 
-    
-
     public LinkedList<Integer> getOffsets(){
         return offsets;
     }

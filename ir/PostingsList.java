@@ -10,6 +10,7 @@ package ir;
 
 import java.util.LinkedList;
 import java.io.Serializable;
+import java.util.Collections;
 
 /**
  *   A list of postings for a given word.
@@ -50,6 +51,10 @@ public class PostingsList implements Serializable {
 
     public void add(PostingsEntry pe){
         list.add(pe);
+    }
+
+    public void sort(){
+        Collections.sort(list);
     }
 }
 

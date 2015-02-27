@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Arrays;
-import java.util.Collections;
+
 
 
 /**
@@ -104,23 +104,23 @@ public class HashedIndex implements Index {
             for(int i = 0; i < terms.length; i++){
                 switch(queryType){
                     case (Index.INTERSECTION_QUERY):
-                        if(i == 0) postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
-                        if(i > 1) postList = intersectionQuery(postList, getPostings(terms[i]));
-                        break;
+                    if(i == 0) postList = intersectionQuery(getPostings(terms[0]), getPostings(terms[1]));
+                    if(i > 1) postList = intersectionQuery(postList, getPostings(terms[i]));
+                    break;
                     case (Index.PHRASE_QUERY):
-                        if(i == 0) postList = phraseQuery(getPostings(terms[0]), getPostings(terms[1]), i+1);
-                        if(i > 1) postList = phraseQuery(postList, getPostings(terms[i]), i);
-                        break;
+                    if(i == 0) postList = phraseQuery(getPostings(terms[0]), getPostings(terms[1]), i+1);
+                    if(i > 1) postList = phraseQuery(postList, getPostings(terms[i]), i);
+                    break;
                     case (Index.RANKED_QUERY):
-                        if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0])), getPostings(terms[1]));
-                        if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]));
-                        break;
+                    if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0])), getPostings(terms[1]));
+                    if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]));
+                    break;
                 }
             }
         }
 
         if (queryType == Index.RANKED_QUERY){
-            Collections.sort(postList.getList());
+            postList.sort();
         }
 
         return postList;
@@ -261,9 +261,9 @@ public class HashedIndex implements Index {
         PostingsEntry pe2;
 
         while (i < p1.size() && j < p2.size()){
+            // insection search 
             pe1 = p1.get(i);
             pe2 = p2.get(j);
-
             if(pe1.docID == pe2.docID){
                 PostingsEntry pe = new PostingsEntry(pe1.docID);
                 pe.score = pe1.score + pe2.score;
@@ -278,8 +278,27 @@ public class HashedIndex implements Index {
                 j++;
             }
         }
-        return postList;
+
+         // if one of the list is finished
+        if(i == p1.size() ){
+            while(j < p2.size()){
+                pe2 = p2.get(j);
+                postList.add(pe2);
+                j++;
+            }
+            return postList;
+        }else{
+            while(i < p1.size()){
+                pe1 = p1.get(i);
+                postList.add(pe1);
+                i++;
+            }
+            return postList;
+        }
+
     }
+
+
 
     /**
      *  No need for cleanup in a HashedIndex.

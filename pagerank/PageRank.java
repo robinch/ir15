@@ -167,22 +167,19 @@ return fileIndex;
         double[] xs = new double[numberOfDocs];
         double diffSum = 0;
         double jPart = BORED/numberOfDocs;;
+        double sinkFactors = 0;        
         xs[0] = 1;
         for (int i = 0; i < MAX_NUMBER_OF_ITERATIONS; i++){
             diffSum = 0;
             x = xs;
             xs = new double[numberOfDocs];
+            sinkFactors = 0;
 
             for (int j = 0; j < numberOfDocs; j++ ){
                 // adds the cP part
                 // is a sink
                 if(out[j] == 0){
-                    for(int k = 0; k < xs.length; k++){
-                        if(k != j){
-                            // adds this value to all but it's own index
-                            xs[k] += x[j]*(1-BORED)/(numberOfDocs-1);    
-                        }   
-                    }
+                    sinkFactors += x[j];
                 } else { // is not a sink
                     double cPart = (1-BORED)/out[j];
                     for(Integer l: link.get(j).keySet()){
@@ -194,6 +191,10 @@ return fileIndex;
             // adds the (1-c)J part
             for (int j = 0; j < numberOfDocs; j++ ){
                 xs[j] += jPart;
+                xs[j] += sinkFactors * (1-BORED)/(numberOfDocs-1);
+                if(out[j] == 0){
+                    xs[j] =  xs[j] - x[j]*(1-BORED)/(numberOfDocs-1);
+                }
                 diffSum = Math.max(diffSum, Math.abs(xs[j] - x[j]));
             }
             

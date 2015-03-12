@@ -8,6 +8,7 @@
 import java.util.*;
 import java.io.*;
 import java.util.Arrays;
+import java.util.Random;
 
 public class PageRank{
 
@@ -188,7 +189,7 @@ return fileIndex;
                 }
             }
 
-            // adds the (1-c)J part
+            // adds the rest
             for (int j = 0; j < numberOfDocs; j++ ){
                 xs[j] += jPart;
                 xs[j] += sinkFactors * (1-BORED)/(numberOfDocs-1);
@@ -233,6 +234,13 @@ return fileIndex;
             System.out.format("%d: %s %.8f%n", i+1, list.get(i).name, list.get(i).score);
         }
     }
+
+
+    public void monteCarlo1(int numberOfDocs){
+        double[] n = new double[numberOfDocs];
+        Random rnd = new Random();
+    }
+
 
     /* --------------------------------------------- */
 

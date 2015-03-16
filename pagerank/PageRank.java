@@ -92,6 +92,8 @@ public class PageRank{
        monteCarlo1(noOfDocs);
        monteCarlo2(noOfDocs);
        monteCarlo3(noOfDocs);
+       monteCarlo4(noOfDocs);
+       monteCarlo5(noOfDocs);
    }
 
 
@@ -317,13 +319,42 @@ return fileIndex;
 
         for (int i = 0; i < numberOfDocs; i++){
             randomDoc = i;
+            nrOfSteps = rnd.nextInt(10);
+            counter += (nrOfSteps + 1);
             for (int j = 0; j < m; j++){
-                nrOfSteps = rnd.nextInt(10);
-                counter += (nrOfSteps + 1);
                 docs[randomDoc]++;
                 for (int k = 0; k < nrOfSteps; k++){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
                     docs[randomDoc]++;
+                }
+            }
+        }
+
+        for (int i = 0; i < numberOfDocs; i++){
+            docs[i] = docs[i]/(counter*m);
+        }
+
+        printResult(docs);
+        System.out.println("----------------------");
+    }
+
+
+    void monteCarlo4(int numberOfDocs){
+        System.out.println("Monte Carlo 4");
+        double[] docs = new double[numberOfDocs];
+        int m = 5; // number of times the walk is done from a doc
+        int randomDoc;
+        int counter = 0;
+
+        for (int i = 0; i < numberOfDocs; i++){
+            randomDoc = i;
+            for (int j = 0; j < m; j++){
+                docs[randomDoc]++;
+                counter++;
+                while(!isDangling(randomDoc)){
+                    randomDoc = randomStep(randomDoc, numberOfDocs);
+                    docs[randomDoc]++;
+                    counter++;
                 }
             }
         }
@@ -335,6 +366,32 @@ return fileIndex;
         printResult(docs);
         System.out.println("----------------------");
     }
+
+
+    void monteCarlo5(int numberOfDocs){
+        System.out.println("Monte Carlo 5");
+        double[] docs = new double[numberOfDocs];
+        int randomDoc;
+        int counter = 0; 
+        for (int i = 0; i < nrOfWalks; i++){
+            randomDoc = rnd.nextInt(numberOfDocs);
+            docs[randomDoc]++;
+            counter++;
+            while(!isDangling(randomDoc)){
+                randomDoc = randomStep(randomDoc, numberOfDocs);
+                docs[randomDoc]++;
+                counter++;
+            }
+        }
+
+        for (int i = 0; i < numberOfDocs; i++){
+            docs[i] = docs[i]/(counter);
+        }
+
+        printResult(docs);
+        System.out.println("----------------------");
+    }
+
     /**
     * Makes a random walk from walk to
     * another doc that it links to
@@ -354,6 +411,10 @@ return fileIndex;
             randomDoc = linkList.get(rnd.nextInt(linkList.size()));
         }
         return randomDoc;
+    }
+
+    boolean isDangling(int doc){
+        return out[doc] == 0;
     }
 
 

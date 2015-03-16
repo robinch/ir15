@@ -74,12 +74,15 @@ public class PageRank{
     * Used to make a random walk
     */
     private Random rnd = new Random(System.currentTimeMillis());
+    private int nrOfWalks;
     
     /* --------------------------------------------- */
 
 
     public PageRank( String filename ) {
        int noOfDocs = readDocs( filename );
+
+       nrOfWalks = noOfDocs;
        
        // Exact method
 
@@ -87,6 +90,7 @@ public class PageRank{
 
        // Monte Carlo methods
        monteCarlo1(noOfDocs);
+       monteCarlo2(noOfDocs);
    }
 
 
@@ -253,17 +257,16 @@ return fileIndex;
     }
 
 
-    public void monteCarlo1(int numberOfDocs){
+    void monteCarlo1(int numberOfDocs){
         System.out.println("Monte Carlo 1");
         double[] docs = new double[numberOfDocs];
-        int nrOfJumps;
+        int nrOfSteps;
         int doc;
-        int nrOfWalks = numberOfDocs;
         int counter;
         int randomDoc = rnd.nextInt(numberOfDocs);
         for (int i = 0; i < nrOfWalks; i++){
-            nrOfJumps = rnd.nextInt(10);
-            for(int j = 0; j < nrOfJumps; j++){
+            nrOfSteps = rnd.nextInt(10);
+            for(int j = 0; j < nrOfSteps; j++){
                 randomDoc = randomStep(randomDoc, numberOfDocs);
             }
             docs[randomDoc]++;
@@ -276,6 +279,31 @@ return fileIndex;
         System.out.println("----------------------");
     }
 
+
+    void monteCarlo2(int numberOfDocs){
+        System.out.println("Monte Carlo 2");
+        double[] docs = new double[numberOfDocs];
+        int m = 5; // number of times the walk is done from a doc
+        int randomDoc;
+        int nrOfSteps;
+
+        for (int i = 0; i < numberOfDocs; i++){
+            randomDoc = i;
+            for (int j = 0; j < m; j++){
+                nrOfSteps = rnd.nextInt(10);
+                for (int k = 0; k < nrOfSteps; k++){
+                    randomDoc = randomStep(randomDoc, numberOfDocs);
+                }
+                docs[randomDoc]++;
+            }
+        }
+
+        for (int i = 0; i < numberOfDocs; i++){
+            docs[i] = docs[i]/(nrOfWalks*m);
+        }
+        printResult(docs);
+        System.out.println("----------------------");
+    } 
 
     /**
     * Makes a random walk from walk to

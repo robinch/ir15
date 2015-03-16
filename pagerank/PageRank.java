@@ -83,7 +83,7 @@ public class PageRank{
        int noOfDocs = readDocs( filename );
 
        nrOfWalks = noOfDocs;
-       
+
        // Exact method
 
        computePagerank( noOfDocs );
@@ -91,6 +91,7 @@ public class PageRank{
        // Monte Carlo methods
        monteCarlo1(noOfDocs);
        monteCarlo2(noOfDocs);
+       monteCarlo3(noOfDocs);
    }
 
 
@@ -305,6 +306,35 @@ return fileIndex;
         System.out.println("----------------------");
     } 
 
+
+    void monteCarlo3(int numberOfDocs){
+        System.out.println("Monte Carlo 3");
+        double[] docs = new double[numberOfDocs];
+        int m = 5; // number of times the walk is done from a doc
+        int randomDoc;
+        int nrOfSteps;
+        int counter = 0;
+
+        for (int i = 0; i < numberOfDocs; i++){
+            randomDoc = i;
+            for (int j = 0; j < m; j++){
+                nrOfSteps = rnd.nextInt(10);
+                counter += (nrOfSteps + 1);
+                docs[randomDoc]++;
+                for (int k = 0; k < nrOfSteps; k++){
+                    randomDoc = randomStep(randomDoc, numberOfDocs);
+                    docs[randomDoc]++;
+                }
+            }
+        }
+
+        for (int i = 0; i < numberOfDocs; i++){
+            docs[i] = docs[i]/(counter);
+        }
+
+        printResult(docs);
+        System.out.println("----------------------");
+    }
     /**
     * Makes a random walk from walk to
     * another doc that it links to

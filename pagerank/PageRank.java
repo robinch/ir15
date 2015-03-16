@@ -83,7 +83,10 @@ public class PageRank{
        
        // Exact method
 
-       // computePagerank( noOfDocs );
+       computePagerank( noOfDocs );
+
+       // Monte Carlo methods
+       monteCarlo1(noOfDocs);
    }
 
 
@@ -171,12 +174,15 @@ return fileIndex;
 	//
 	//   YOUR CODE HERE
 	//
+
+        System.out.println("Power Iteration!");
         // intialise x and xs
         double[] x = new double[numberOfDocs];
         double[] xs = new double[numberOfDocs];
         double diffSum = 0;
         double jPart = BORED/numberOfDocs;;
         double sinkFactors = 0;        
+        int iterations = 0;
         xs[0] = 1;
         for (int i = 0; i < MAX_NUMBER_OF_ITERATIONS; i++){
             diffSum = 0;
@@ -212,9 +218,12 @@ return fileIndex;
                 System.out.println("EPSILON!!!");
                 break;
             }
-            System.out.println("iteration: "+ i);
+            iterations++;
+            
         }
+        System.out.println("iterations: " + iterations);
         printResult(xs);
+        System.out.println("----------------------");
     }
 
 
@@ -245,7 +254,26 @@ return fileIndex;
 
 
     public void monteCarlo1(int numberOfDocs){
-        double[] n = new double[numberOfDocs];
+        System.out.println("Monte Carlo 1");
+        double[] docs = new double[numberOfDocs];
+        int nrOfJumps;
+        int doc;
+        int nrOfWalks = numberOfDocs;
+        int counter;
+        int randomDoc = rnd.nextInt(numberOfDocs);
+        for (int i = 0; i < nrOfWalks; i++){
+            nrOfJumps = rnd.nextInt(10);
+            for(int j = 0; j < nrOfJumps; j++){
+                randomDoc = randomStep(randomDoc, numberOfDocs);
+            }
+            docs[randomDoc]++;
+        }
+        for (int i = 0; i < numberOfDocs; i++){
+            docs[i] = docs[i]/nrOfWalks;
+        }
+        
+        printResult(docs);
+        System.out.println("----------------------");
     }
 
 
@@ -255,12 +283,12 @@ return fileIndex;
     * Also has the probability BORED
     * to make a jump to any document
     */
-    private int randomWalk(int doc, int numberOfDocs){   
+    private int randomStep(int doc, int numberOfDocs){   
 
         int randomDoc;
-        // Check if bored
-        if(rnd.nextDouble() <= BORED){
-            randomDoc = rnd.nextInt(numberOfDocs) + 1;
+        // Check if bored or sink
+        if(rnd.nextDouble() <= BORED || out[doc] == 0){
+            randomDoc = rnd.nextInt(numberOfDocs);
         } else {
             LinkedList<Integer> linkList = new LinkedList<Integer>();
             linkList.addAll(link.get(doc).keySet());

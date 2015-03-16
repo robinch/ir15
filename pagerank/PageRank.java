@@ -69,13 +69,21 @@ public class PageRank{
      */
     final static int MAX_NUMBER_OF_ITERATIONS = 1000;   //org value 1000
 
+
+    /**
+    * Used to make a random walk
+    */
+    private Random rnd = new Random(System.currentTimeMillis());
     
     /* --------------------------------------------- */
 
 
     public PageRank( String filename ) {
        int noOfDocs = readDocs( filename );
-       computePagerank( noOfDocs );
+       
+       // Exact method
+
+       // computePagerank( noOfDocs );
    }
 
 
@@ -238,7 +246,28 @@ return fileIndex;
 
     public void monteCarlo1(int numberOfDocs){
         double[] n = new double[numberOfDocs];
-        Random rnd = new Random();
+    }
+
+
+    /**
+    * Makes a random walk from walk to
+    * another doc that it links to
+    * Also has the probability BORED
+    * to make a jump to any document
+    */
+    private int randomWalk(int doc, int numberOfDocs){   
+
+        int randomDoc;
+        // Check if bored
+        if(rnd.nextDouble() <= BORED){
+            randomDoc = rnd.nextInt(numberOfDocs) + 1;
+        } else {
+            LinkedList<Integer> linkList = new LinkedList<Integer>();
+            linkList.addAll(link.get(doc).keySet());
+            // Gets a random doc from the docs list of links
+            randomDoc = linkList.get(rnd.nextInt(linkList.size()));
+        }
+        return randomDoc;
     }
 
 

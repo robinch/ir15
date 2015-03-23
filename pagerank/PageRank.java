@@ -92,21 +92,14 @@ public class PageRank{
        System.out.println("-----------------------");
 
        // Monte Carlo methods
-       System.out.println("Monte Carlo 1");
+       
        double[] mc1 = monteCarlo1(noOfDocs);
-       System.out.println("-----------------------");
-       System.out.println("Monte Carlo 2");
-       double[] mc2 = monteCarlo2(noOfDocs);
-       System.out.println("-----------------------");
-       System.out.println("Monte Carlo 3");
-       double[] mc3 = monteCarlo3(noOfDocs);
-       System.out.println("-----------------------");
-       System.out.println("Monte Carlo 4");
-       double[] mc4 = monteCarlo4(noOfDocs);
-       System.out.println("-----------------------");
-       System.out.println("Monte Carlo 5");
+       double[] mc2 = monteCarlo2(noOfDocs);       
+       double[] mc3 = monteCarlo3(noOfDocs);      
+       double[] mc4 = monteCarlo4(noOfDocs);      
        double[] mc5 = monteCarlo5(noOfDocs);
-       System.out.println("-----------------------");
+       
+       printSquareDiff(sortedIndexes, pr, mc1, mc2, mc3, mc4, mc5);
 
    }
 
@@ -405,22 +398,33 @@ return fileIndex;
         }
     }
 
-    // void printSquareDiff(Integer[] sortedIndexes, double[] pi, double[] mc1, double[] mc2, double[] mc3, double[] mc4, double mc5){
-    //     System.out.println("Square Diffs");
-    //     System.out.println("Name\tExact\tmc1\tmc2\tmc3\tmc4\tmc5");
-    //     List<double[]> list = new ArrayList<double[]>{pi, mc1, mc2, mc3, mc4, mc5};
-    //     double[] squaredDiff = new double[6];
-    //     for (int i = 0; i < 50; i++){
-    //         index = sortedIndexes[i]
-    //         squaredDiff = pi[index] - mc[index];
-    //         squaredDiff *= squaredDiff;
-    //         System.out.format("");
-    //     }
-    // }
+    void printSquareDiff(Integer[] sortedIndexes, double[] pi, double[] mc1, double[] mc2, double[] mc3, double[] mc4, double[] mc5){
+        System.out.println("Square Diffs");
+        System.out.println("Name\tExact\t\tmc1\t\tmc2\t\tmc3\t\tmc4\t\tmc5");
+        List<double[]> mcs = new ArrayList<double[]>(5);
+        mcs.add(mc1);
+        mcs.add(mc2);
+        mcs.add(mc3);
+        mcs.add(mc4);
+        mcs.add(mc5);
+
+        int index;
+        double[] diffs = new double[6];
+        for (int i = 0; i < 50; i++){
+            index = sortedIndexes[i];
+            diffs[0] = pi[index];
+            for(int j = 0; j < mcs.size(); j++){
+                diffs[j+1] = pi[index] - mcs.get(j)[index];
+                diffs[j+1] *= diffs[j+1];
+            }
+            System.out.format("%s\t%.8f\t%.8f\t%.8f\t%.8f\t%.8f\t%.8f%n", docName[index], diffs[0], diffs[1], diffs[2], diffs[3], diffs[4], diffs[5]);
+        }
+        return;
+    }
 
 
 
-    Integer[] sortedIndexArray(double[] array){
+    private Integer[] sortedIndexArray(double[] array){
         final double[] list = array;
         Integer[] sorted = new Integer[array.length];
         for(int i = 0; i < array.length; i++){

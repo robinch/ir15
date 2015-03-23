@@ -85,15 +85,29 @@ public class PageRank{
        nrOfWalks = noOfDocs;
 
        // Exact method
-
-       computePagerank( noOfDocs );
+        System.out.println("Power Iteration!");
+       double[] pr = computePagerank( noOfDocs );
+       Integer[] sortedIndexes = sortedIndexArray(pr);
+       printResult(pr, sortedIndexes);
+       System.out.println("-----------------------");
 
        // Monte Carlo methods
-       monteCarlo1(noOfDocs);
-       monteCarlo2(noOfDocs);
-       monteCarlo3(noOfDocs);
-       monteCarlo4(noOfDocs);
-       monteCarlo5(noOfDocs);
+       System.out.println("Monte Carlo 1");
+       double[] mc1 = monteCarlo1(noOfDocs);
+       System.out.println("-----------------------");
+       System.out.println("Monte Carlo 2");
+       double[] mc2 = monteCarlo2(noOfDocs);
+       System.out.println("-----------------------");
+       System.out.println("Monte Carlo 3");
+       double[] mc3 = monteCarlo3(noOfDocs);
+       System.out.println("-----------------------");
+       System.out.println("Monte Carlo 4");
+       double[] mc4 = monteCarlo4(noOfDocs);
+       System.out.println("-----------------------");
+       System.out.println("Monte Carlo 5");
+       double[] mc5 = monteCarlo5(noOfDocs);
+       System.out.println("-----------------------");
+
    }
 
 
@@ -177,12 +191,10 @@ return fileIndex;
     /*
      *   Computes the pagerank of each document.
      */
-    void computePagerank( int numberOfDocs ) {
+    double[] computePagerank( int numberOfDocs ) {
 	//
 	//   YOUR CODE HERE
 	//
-
-        System.out.println("Power Iteration!");
         // intialise x and xs
         double[] x = new double[numberOfDocs];
         double[] xs = new double[numberOfDocs];
@@ -229,39 +241,11 @@ return fileIndex;
             
         }
         System.out.println("iterations: " + iterations);
-        printResult(xs);
-        System.out.println("----------------------");
-    }
-
-
-    private void printResult(double[] x){ 
-        class Pair implements Comparable<Pair>{
-            String name;
-            double score;
-            Pair(String name, double score){
-                this.name = name;
-                this.score = score;
-            }
-            public int compareTo( Pair other ) {
-                return Double.compare( other.score, score );
-            }
-        }
-
-        List<Pair> list = new ArrayList<Pair>(x.length);
-        for(int i = 0; i < x.length; i++){
-            list.add(new Pair(docName[i], x[i]));
-        }
+        return xs;
         
-        Collections.sort(list);
-
-        for(int i = 0; i < 50; i++){
-            System.out.format("%d: %s %.8f%n", i+1, list.get(i).name, list.get(i).score);
-        }
     }
 
-
-    void monteCarlo1(int numberOfDocs){
-        System.out.println("Monte Carlo 1");
+    double[] monteCarlo1(int numberOfDocs){
         double[] docs = new double[numberOfDocs];
         int nrOfSteps;
         int doc;
@@ -278,21 +262,20 @@ return fileIndex;
             docs[i] = docs[i]/nrOfWalks;
         }
         
-        printResult(docs);
-        System.out.println("----------------------");
+        return docs;
+        
     }
 
 
-    void monteCarlo2(int numberOfDocs){
-        System.out.println("Monte Carlo 2");
+    double[] monteCarlo2(int numberOfDocs){
         double[] docs = new double[numberOfDocs];
         int m = 5; // number of times the walk is done from a doc
         int randomDoc;
         int nrOfSteps;
 
         for (int i = 0; i < numberOfDocs; i++){
-            randomDoc = i;
             for (int j = 0; j < m; j++){
+                randomDoc = i;
                 nrOfSteps = rnd.nextInt(10);
                 for (int k = 0; k < nrOfSteps; k++){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
@@ -304,13 +287,12 @@ return fileIndex;
         for (int i = 0; i < numberOfDocs; i++){
             docs[i] = docs[i]/(nrOfWalks*m);
         }
-        printResult(docs);
-        System.out.println("----------------------");
+        return docs;
+    
     } 
 
 
-    void monteCarlo3(int numberOfDocs){
-        System.out.println("Monte Carlo 3");
+    double[] monteCarlo3(int numberOfDocs){
         double[] docs = new double[numberOfDocs];
         int m = 5; // number of times the walk is done from a doc
         int randomDoc;
@@ -318,10 +300,10 @@ return fileIndex;
         int counter = 0;
 
         for (int i = 0; i < numberOfDocs; i++){
-            randomDoc = i;
             nrOfSteps = rnd.nextInt(10);
             counter += (nrOfSteps + 1);
             for (int j = 0; j < m; j++){
+                randomDoc = i;
                 docs[randomDoc]++;
                 for (int k = 0; k < nrOfSteps; k++){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
@@ -334,13 +316,11 @@ return fileIndex;
             docs[i] = docs[i]/(counter*m);
         }
 
-        printResult(docs);
-        System.out.println("----------------------");
+        return docs;
     }
 
 
-    void monteCarlo4(int numberOfDocs){
-        System.out.println("Monte Carlo 4");
+    double[] monteCarlo4(int numberOfDocs){
         double[] docs = new double[numberOfDocs];
         int m = 5; // number of times the walk is done from a doc
         int randomDoc;
@@ -349,6 +329,7 @@ return fileIndex;
         for (int i = 0; i < numberOfDocs; i++){
             randomDoc = i;
             for (int j = 0; j < m; j++){
+                randomDoc = i;
                 docs[randomDoc]++;
                 counter++;
                 while(!isDangling(randomDoc)){
@@ -363,13 +344,11 @@ return fileIndex;
             docs[i] = docs[i]/(counter);
         }
 
-        printResult(docs);
-        System.out.println("----------------------");
+        return docs;
     }
 
 
-    void monteCarlo5(int numberOfDocs){
-        System.out.println("Monte Carlo 5");
+    double[] monteCarlo5(int numberOfDocs){
         double[] docs = new double[numberOfDocs];
         int randomDoc;
         int counter = 0; 
@@ -388,8 +367,8 @@ return fileIndex;
             docs[i] = docs[i]/(counter);
         }
 
-        printResult(docs);
-        System.out.println("----------------------");
+        return docs;
+        
     }
 
     /**
@@ -420,6 +399,45 @@ return fileIndex;
 
     /* --------------------------------------------- */
 
+    private void printResult(double[] x, Integer[] orderedList){ 
+        for(int i = 0; i < 50; i++){
+            System.out.format("%d: %s %.8f%n", i+1, docName[orderedList[i]], x[orderedList[i]]);
+        }
+    }
+
+    // void printSquareDiff(Integer[] sortedIndexes, double[] pi, double[] mc1, double[] mc2, double[] mc3, double[] mc4, double mc5){
+    //     System.out.println("Square Diffs");
+    //     System.out.println("Name\tExact\tmc1\tmc2\tmc3\tmc4\tmc5");
+    //     List<double[]> list = new ArrayList<double[]>{pi, mc1, mc2, mc3, mc4, mc5};
+    //     double[] squaredDiff = new double[6];
+    //     for (int i = 0; i < 50; i++){
+    //         index = sortedIndexes[i]
+    //         squaredDiff = pi[index] - mc[index];
+    //         squaredDiff *= squaredDiff;
+    //         System.out.format("");
+    //     }
+    // }
+
+
+
+    Integer[] sortedIndexArray(double[] array){
+        final double[] list = array;
+        Integer[] sorted = new Integer[array.length];
+        for(int i = 0; i < array.length; i++){
+            sorted[i] = i;
+        }
+        Arrays.sort(sorted, new Comparator<Integer>() {
+            @Override
+            public int compare(Integer i, Integer j){
+                double d = (list[j] - list[i]);
+                if(d < 0 ) return -1;
+                if(d == 0) return 0;
+                else return 1;
+            }
+        });
+        return sorted;
+    }
+
     public static void main( String[] args ) {
        if ( args.length != 1 ) {
            System.err.println( "Please give the name of the link file" );
@@ -428,4 +446,7 @@ return fileIndex;
            new PageRank( args[0] );
        }
    }
+
+
+   
 }

@@ -9,6 +9,7 @@ import java.util.*;
 import java.io.*;
 import java.util.Arrays;
 import java.util.Random;
+import java.text.*;
 
 public class PageRank{
 
@@ -80,31 +81,32 @@ public class PageRank{
 
 
     public PageRank( String filename ) {
-       int noOfDocs = readDocs( filename );
+     int noOfDocs = readDocs( filename );
 
-       nrOfWalks = noOfDocs;
+     nrOfWalks = noOfDocs;
 
        // Exact method
-        System.out.println("Power Iteration!");
-       double[] pr = computePagerank( noOfDocs );
-       Integer[] sortedIndexes = sortedIndexArray(pr);
-       printResult(pr, sortedIndexes);
-       System.out.println("-----------------------");
+     System.out.println("Power Iteration!");
+     double[] pr = computePagerank( noOfDocs );
+     Integer[] sortedIndexes = sortedIndexArray(pr);
+     printResult(pr, sortedIndexes);
+     System.out.println("-----------------------");
 
        // Monte Carlo methods
-       
-       double[] mc1 = monteCarlo1(noOfDocs);
-       double[] mc2 = monteCarlo2(noOfDocs);       
-       double[] mc3 = monteCarlo3(noOfDocs);      
-       double[] mc4 = monteCarlo4(noOfDocs);      
-       double[] mc5 = monteCarlo5(noOfDocs);
-       
-       printSquareDiff(sortedIndexes, pr, mc1, mc2, mc3, mc4, mc5);
+     for (int m = 1; m < 11; m++){
+        System.out.format("Square diffs N = %d, (m = %d)%n", noOfDocs*m, m);
+        double[] mc1 = monteCarlo1(noOfDocs, noOfDocs*m);
+        double[] mc2 = monteCarlo2(noOfDocs, m);       
+        double[] mc3 = monteCarlo3(noOfDocs, m); 
+        double[] mc4 = monteCarlo4(noOfDocs, m);      
+        double[] mc5 = monteCarlo5(noOfDocs, noOfDocs*m); 
+        printSquareDiff(sortedIndexes, pr, mc1, mc2, mc3, mc4, mc5);
+        System.out.println("----------------------");
+    }
+}
 
-   }
 
-
-   /* --------------------------------------------- */
+/* --------------------------------------------- */
 
 
     /**
@@ -117,61 +119,61 @@ public class PageRank{
      *   @return the number of documents read.
      */
     int readDocs( String filename ) {
-       int fileIndex = 0;
-       try {
-           System.err.print( "Reading file... " );
-           BufferedReader in = new BufferedReader( new FileReader( filename ));
-           String line;
-           while ((line = in.readLine()) != null && fileIndex<MAX_NUMBER_OF_DOCS ) {
-              int index = line.indexOf( ";" );
-              String title = line.substring( 0, index );
-              Integer fromdoc = docNumber.get( title );
+     int fileIndex = 0;
+     try {
+         System.err.print( "Reading file... " );
+         BufferedReader in = new BufferedReader( new FileReader( filename ));
+         String line;
+         while ((line = in.readLine()) != null && fileIndex<MAX_NUMBER_OF_DOCS ) {
+          int index = line.indexOf( ";" );
+          String title = line.substring( 0, index );
+          Integer fromdoc = docNumber.get( title );
 		//  Have we seen this document before?
-              if ( fromdoc == null ) {	
+          if ( fromdoc == null ) {	
 		    // This is a previously unseen doc, so add it to the table.
-                  fromdoc = fileIndex++;
-                  docNumber.put( title, fromdoc );
-                  docName[fromdoc] = title;
-              }
+              fromdoc = fileIndex++;
+              docNumber.put( title, fromdoc );
+              docName[fromdoc] = title;
+          }
 		// Check all outlinks.
-              StringTokenizer tok = new StringTokenizer( line.substring(index+1), "," );
-              while ( tok.hasMoreTokens() && fileIndex<MAX_NUMBER_OF_DOCS ) {
-                  String otherTitle = tok.nextToken();
-                  Integer otherDoc = docNumber.get( otherTitle );
-                  if ( otherDoc == null ) {
+          StringTokenizer tok = new StringTokenizer( line.substring(index+1), "," );
+          while ( tok.hasMoreTokens() && fileIndex<MAX_NUMBER_OF_DOCS ) {
+              String otherTitle = tok.nextToken();
+              Integer otherDoc = docNumber.get( otherTitle );
+              if ( otherDoc == null ) {
 			// This is a previousy unseen doc, so add it to the table.
-                     otherDoc = fileIndex++;
-                     docNumber.put( otherTitle, otherDoc );
-                     docName[otherDoc] = otherTitle;
-                 }
+               otherDoc = fileIndex++;
+               docNumber.put( otherTitle, otherDoc );
+               docName[otherDoc] = otherTitle;
+           }
 		    // Set the probability to 0 for now, to indicate that there is
 		    // a link from fromdoc to otherDoc.
-                 if ( link.get(fromdoc) == null ) {
-                     link.put(fromdoc, new Hashtable<Integer,Boolean>());
-                 }
-                 if ( link.get(fromdoc).get(otherDoc) == null ) {
-                     link.get(fromdoc).put( otherDoc, true );
-                     out[fromdoc]++;
-                 }
-             }
-         }
-         if ( fileIndex >= MAX_NUMBER_OF_DOCS ) {
-          System.err.print( "stopped reading since documents table is full. " );
-      }
-      else {
-          System.err.print( "done. " );
-      }
-	    // Compute the number of sinks.
-      for ( int i=0; i<fileIndex; i++ ) {
-          if ( out[i] == 0 )
-              numberOfSinks++;
-      }
+           if ( link.get(fromdoc) == null ) {
+               link.put(fromdoc, new Hashtable<Integer,Boolean>());
+           }
+           if ( link.get(fromdoc).get(otherDoc) == null ) {
+               link.get(fromdoc).put( otherDoc, true );
+               out[fromdoc]++;
+           }
+       }
+   }
+   if ( fileIndex >= MAX_NUMBER_OF_DOCS ) {
+      System.err.print( "stopped reading since documents table is full. " );
   }
-  catch ( FileNotFoundException e ) {
-   System.err.println( "File " + filename + " not found!" );
+  else {
+      System.err.print( "done. " );
+  }
+	    // Compute the number of sinks.
+  for ( int i=0; i<fileIndex; i++ ) {
+      if ( out[i] == 0 )
+          numberOfSinks++;
+  }
+}
+catch ( FileNotFoundException e ) {
+ System.err.println( "File " + filename + " not found!" );
 }
 catch ( IOException e ) {
-   System.err.println( "Error reading file " + filename );
+ System.err.println( "Error reading file " + filename );
 }
 System.err.println( "Read " + fileIndex + " number of documents" );
 return fileIndex;
@@ -238,21 +240,21 @@ return fileIndex;
         
     }
 
-    double[] monteCarlo1(int numberOfDocs){
+    double[] monteCarlo1(int numberOfDocs, int n){
         double[] docs = new double[numberOfDocs];
         int nrOfSteps;
         int doc;
         int counter;
         int randomDoc = rnd.nextInt(numberOfDocs);
-        for (int i = 0; i < nrOfWalks; i++){
-            nrOfSteps = rnd.nextInt(10);
+        for (int i = 0; i < n; i++){
+            nrOfSteps = rnd.nextInt(15);
             for(int j = 0; j < nrOfSteps; j++){
                 randomDoc = randomStep(randomDoc, numberOfDocs);
             }
             docs[randomDoc]++;
         }
         for (int i = 0; i < numberOfDocs; i++){
-            docs[i] = docs[i]/nrOfWalks;
+            docs[i] = docs[i]/n;
         }
         
         return docs;
@@ -260,16 +262,15 @@ return fileIndex;
     }
 
 
-    double[] monteCarlo2(int numberOfDocs){
+    double[] monteCarlo2(int numberOfDocs, int m){
         double[] docs = new double[numberOfDocs];
-        int m = 5; // number of times the walk is done from a doc
         int randomDoc;
         int nrOfSteps;
 
         for (int i = 0; i < numberOfDocs; i++){
             for (int j = 0; j < m; j++){
                 randomDoc = i;
-                nrOfSteps = rnd.nextInt(10);
+                nrOfSteps = rnd.nextInt(15);
                 for (int k = 0; k < nrOfSteps; k++){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
                 }
@@ -281,19 +282,18 @@ return fileIndex;
             docs[i] = docs[i]/(nrOfWalks*m);
         }
         return docs;
-    
+
     } 
 
 
-    double[] monteCarlo3(int numberOfDocs){
+    double[] monteCarlo3(int numberOfDocs, int m){
         double[] docs = new double[numberOfDocs];
-        int m = 5; // number of times the walk is done from a doc
         int randomDoc;
         int nrOfSteps;
         int counter = 0;
 
         for (int i = 0; i < numberOfDocs; i++){
-            nrOfSteps = rnd.nextInt(10);
+            nrOfSteps = rnd.nextInt(15);
             counter += (nrOfSteps + 1);
             for (int j = 0; j < m; j++){
                 randomDoc = i;
@@ -313,51 +313,49 @@ return fileIndex;
     }
 
 
-    double[] monteCarlo4(int numberOfDocs){
+    double[] monteCarlo4(int numberOfDocs, int m){
         double[] docs = new double[numberOfDocs];
-        int m = 5; // number of times the walk is done from a doc
         int randomDoc;
-        int counter = 0;
+        int visits = 0;
 
         for (int i = 0; i < numberOfDocs; i++){
-            randomDoc = i;
             for (int j = 0; j < m; j++){
                 randomDoc = i;
                 docs[randomDoc]++;
-                counter++;
+                visits++;
                 while(!isDangling(randomDoc)){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
                     docs[randomDoc]++;
-                    counter++;
+                    visits++;
                 }
             }
         }
 
         for (int i = 0; i < numberOfDocs; i++){
-            docs[i] = docs[i]/(counter);
+            docs[i] = docs[i]/(visits);
         }
 
         return docs;
     }
 
 
-    double[] monteCarlo5(int numberOfDocs){
+    double[] monteCarlo5(int numberOfDocs, int n){
         double[] docs = new double[numberOfDocs];
         int randomDoc;
-        int counter = 0; 
-        for (int i = 0; i < nrOfWalks; i++){
+        int visits = 0; 
+        for (int i = 0; i < n; i++){
             randomDoc = rnd.nextInt(numberOfDocs);
             docs[randomDoc]++;
-            counter++;
+            visits++;
             while(!isDangling(randomDoc)){
                 randomDoc = randomStep(randomDoc, numberOfDocs);
                 docs[randomDoc]++;
-                counter++;
+                visits++;
             }
         }
 
         for (int i = 0; i < numberOfDocs; i++){
-            docs[i] = docs[i]/(counter);
+            docs[i] = docs[i]/(visits);
         }
 
         return docs;
@@ -393,33 +391,41 @@ return fileIndex;
     /* --------------------------------------------- */
 
     private void printResult(double[] x, Integer[] orderedList){ 
+        NumberFormat f = new DecimalFormat("0.######E0");
         for(int i = 0; i < 50; i++){
-            System.out.format("%d: %s %.8f%n", i+1, docName[orderedList[i]], x[orderedList[i]]);
+            System.out.format("%d:\t%s\t%s%n", i+1, docName[orderedList[i]], f.format(x[orderedList[i]]));
         }
     }
 
     void printSquareDiff(Integer[] sortedIndexes, double[] pi, double[] mc1, double[] mc2, double[] mc3, double[] mc4, double[] mc5){
-        System.out.println("Square Diffs");
-        System.out.println("Name\tExact\t\tmc1\t\tmc2\t\tmc3\t\tmc4\t\tmc5");
+        System.out.println("mc1\t\tmc2\t\tmc3\t\tmc4\t\tmc5");
+        NumberFormat f = new DecimalFormat("0.######E0");  // the decimalformat that will be printed
         List<double[]> mcs = new ArrayList<double[]>(5);
         mcs.add(mc1);
         mcs.add(mc2);
         mcs.add(mc3);
         mcs.add(mc4);
         mcs.add(mc5);
-
-        int index;
-        double[] diffs = new double[6];
+        int topIndex, bottomIndex;
+        double[] topDiffs = new double[mcs.size()];
+        double[] bottomDiffs = new double[mcs.size()];
+        double diff = 0;
         for (int i = 0; i < 50; i++){
-            index = sortedIndexes[i];
-            diffs[0] = pi[index];
+            topIndex = sortedIndexes[i];
+            bottomIndex = sortedIndexes[sortedIndexes.length - 1 - i];
             for(int j = 0; j < mcs.size(); j++){
-                diffs[j+1] = pi[index] - mcs.get(j)[index];
-                diffs[j+1] *= diffs[j+1];
+                //top diffs
+                diff = pi[topIndex] - mcs.get(j)[topIndex];
+                diff *= diff;
+                topDiffs[j] += diff;
+                // bottendiffs
+                diff = pi[bottomIndex] - mcs.get(j)[bottomIndex];
+                diff *= diff;
+                bottomDiffs[j] = diff;
             }
-            System.out.format("%s\t%.8f\t%.8f\t%.8f\t%.8f\t%.8f\t%.8f%n", docName[index], diffs[0], diffs[1], diffs[2], diffs[3], diffs[4], diffs[5]);
         }
-        return;
+        System.out.format("%s\t%s\t%s\t%s\t%s\t(top 50)%n",f.format(topDiffs[0]), f.format(topDiffs[1]), f.format(topDiffs[2]), f.format(topDiffs[3]), f.format(topDiffs[4]));
+        System.out.format("%s\t%s\t%s\t%s\t%s\t(bottom 50)%n",f.format(bottomDiffs[0]), f.format(bottomDiffs[1]), f.format(bottomDiffs[2]), f.format(bottomDiffs[3]), f.format(bottomDiffs[4]));      
     }
 
 
@@ -433,24 +439,21 @@ return fileIndex;
         Arrays.sort(sorted, new Comparator<Integer>() {
             @Override
             public int compare(Integer i, Integer j){
-                double d = (list[j] - list[i]);
-                if(d < 0 ) return -1;
-                if(d == 0) return 0;
-                else return 1;
+                return Double.compare(list[j], list[i]);
             }
         });
         return sorted;
     }
 
     public static void main( String[] args ) {
-       if ( args.length != 1 ) {
-           System.err.println( "Please give the name of the link file" );
-       }
-       else {
-           new PageRank( args[0] );
-       }
-   }
+     if ( args.length != 1 ) {
+         System.err.println( "Please give the name of the link file" );
+     }
+     else {
+         new PageRank( args[0] );
+     }
+ }
 
 
-   
+
 }

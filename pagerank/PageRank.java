@@ -75,7 +75,7 @@ public class PageRank{
     * Used to make a random walk
     */
     private Random rnd = new Random(System.currentTimeMillis());
-    private int nrOfWalks;
+    final static int MAX_NR_OF_STEPS = 50;
     
     /* --------------------------------------------- */
 
@@ -83,11 +83,15 @@ public class PageRank{
     public PageRank( String filename ) {
      int noOfDocs = readDocs( filename );
 
-     nrOfWalks = noOfDocs;
+     long start;
+     long stop;
 
        // Exact method
      System.out.println("Power Iteration!");
+     start = System.nanoTime();
      double[] pr = computePagerank( noOfDocs );
+     stop = System.nanoTime();
+     System.out.format("Time taken: %d ms%n", (stop-start)/1000000);
      Integer[] sortedIndexes = sortedIndexArray(pr);
      printResult(pr, sortedIndexes);
      System.out.println("-----------------------");
@@ -95,11 +99,26 @@ public class PageRank{
        // Monte Carlo methods
      for (int m = 1; m < 11; m++){
         System.out.format("Square diffs N = %d, (m = %d)%n", noOfDocs*m, m);
+        start = System.nanoTime();
         double[] mc1 = monteCarlo1(noOfDocs, noOfDocs*m);
+        stop = System.nanoTime();
+        System.out.format("Time taken: %d ms (mc1)%n", (stop-start)/1000000);
+        start = System.nanoTime();
         double[] mc2 = monteCarlo2(noOfDocs, m);       
+        stop = System.nanoTime();
+        System.out.format("Time taken: %d ms (mc2)%n", (stop-start)/1000000);
+        start = System.nanoTime();
         double[] mc3 = monteCarlo3(noOfDocs, m); 
+        stop = System.nanoTime();
+        System.out.format("Time taken: %d ms (mc3)%n", (stop-start)/1000000);
+        start = System.nanoTime();
         double[] mc4 = monteCarlo4(noOfDocs, m);      
-        double[] mc5 = monteCarlo5(noOfDocs, noOfDocs*m); 
+        stop = System.nanoTime();
+        System.out.format("Time taken: %d ms (mc4)%n", (stop-start)/1000000);
+        start = System.nanoTime();
+        double[] mc5 = monteCarlo5(noOfDocs, noOfDocs*m);
+        stop = System.nanoTime();
+        System.out.format("Time taken: %d ms (mc5)%n", (stop-start)/1000000);
         printSquareDiff(sortedIndexes, pr, mc1, mc2, mc3, mc4, mc5);
         System.out.println("----------------------");
     }
@@ -247,7 +266,7 @@ return fileIndex;
         int counter;
         int randomDoc = rnd.nextInt(numberOfDocs);
         for (int i = 0; i < n; i++){
-            nrOfSteps = rnd.nextInt(15);
+            nrOfSteps = rnd.nextInt(MAX_NR_OF_STEPS);
             for(int j = 0; j < nrOfSteps; j++){
                 randomDoc = randomStep(randomDoc, numberOfDocs);
             }
@@ -270,7 +289,7 @@ return fileIndex;
         for (int i = 0; i < numberOfDocs; i++){
             for (int j = 0; j < m; j++){
                 randomDoc = i;
-                nrOfSteps = rnd.nextInt(15);
+                nrOfSteps = rnd.nextInt(MAX_NR_OF_STEPS);
                 for (int k = 0; k < nrOfSteps; k++){
                     randomDoc = randomStep(randomDoc, numberOfDocs);
                 }
@@ -279,7 +298,7 @@ return fileIndex;
         }
 
         for (int i = 0; i < numberOfDocs; i++){
-            docs[i] = docs[i]/(nrOfWalks*m);
+            docs[i] = docs[i]/(numberOfDocs*m);
         }
         return docs;
 
@@ -293,7 +312,7 @@ return fileIndex;
         int counter = 0;
 
         for (int i = 0; i < numberOfDocs; i++){
-            nrOfSteps = rnd.nextInt(15);
+            nrOfSteps = rnd.nextInt(MAX_NR_OF_STEPS);
             counter += (nrOfSteps + 1);
             for (int j = 0; j < m; j++){
                 randomDoc = i;

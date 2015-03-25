@@ -78,7 +78,6 @@ public class HashedIndex implements Index {
 	//
 
 
-
         String[] terms = new String[query.size()];
         String s = "";
         for(int i = 0; i < query.size(); i++ ){

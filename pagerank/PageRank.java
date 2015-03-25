@@ -96,6 +96,10 @@ public class PageRank{
      printResult(pr, sortedIndexes);
      System.out.println("-----------------------");
 
+       // write to file
+     HashMap<String,String> nameToTitle = readArticleTitles("articleTitles.txt");
+     writeToFile("ranks.txt", pr, nameToTitle);
+
        // Monte Carlo methods
      for (int m = 1; m < 11; m++){
         System.out.format("Square diffs N = %d, (m = %d)%n", noOfDocs*m, m);
@@ -464,6 +468,38 @@ return fileIndex;
         return sorted;
     }
 
+
+    public void writeToFile(String path, double[] ranks, HashMap<String,String> map){
+        try{
+            PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(path)));
+
+            for (int i = 0; i < ranks.length; i++){
+                writer.println(map.get(docName[i])+ ";" + ranks[i]);
+            }
+            writer.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
+
+    public HashMap<String,String> readArticleTitles(String path){
+        HashMap map = new HashMap<String,String>();
+        String line;
+        String[] s = new String[2];
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            while((line = br.readLine()) != null){
+                s = line.split(";");
+                map.put(s[0], s[1]);
+            }
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        return map;
+    }
+
     public static void main( String[] args ) {
      if ( args.length != 1 ) {
          System.err.println( "Please give the name of the link file" );
@@ -472,7 +508,6 @@ return fileIndex;
          new PageRank( args[0] );
      }
  }
-
 
 
 }

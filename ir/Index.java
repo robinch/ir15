@@ -34,6 +34,7 @@ public interface Index {
 	
     public HashMap<String, String> docIDs = new HashMap<String,String>();
     public HashMap<String,Integer> docLengths = new HashMap<String,Integer>();
+    public HashMap<String, Double> docRanking = new HashMap<String,Double>();
 
     public void insert( String token, int docID, int offset );
     public Iterator<String> getDictionary();

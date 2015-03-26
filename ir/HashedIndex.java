@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Arrays;
+import java.io.*;
 
 
 
@@ -28,6 +29,27 @@ public class HashedIndex implements Index {
     /** The index as a hashtable. */
     private HashMap<String,PostingsList> index = new HashMap<String,PostingsList>();
     
+
+    public HashedIndex(){
+        readRankingFile("pagerank/ranks.txt");
+
+    }
+
+    private void readRankingFile(String path){
+        String line;
+        String[] s;
+        try{
+            BufferedReader br = new BufferedReader(new FileReader(path));
+            while((line = br.readLine()) != null){
+                s = line.split(";");
+                Index.docRanking.put(s[0], new Double(s[1]));
+            }
+            br.close();
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 
     /**
      *  Inserts this token in the index.
@@ -76,8 +98,10 @@ public class HashedIndex implements Index {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
 	//
-
-
+        // for (String s: docIDs.keySet()){
+        //     System.out.format("Key: %s Value:%s", s, docIDs.get(s));
+        
+        // }
         String[] terms = new String[query.size()];
         String s = "";
         for(int i = 0; i < query.size(); i++ ){
@@ -95,7 +119,7 @@ public class HashedIndex implements Index {
         if (terms.length == 1){
             if(queryType == Index.RANKED_QUERY)
             {
-                postList = rankedQuery(getPostings(terms[0]));
+                postList = rankedQuery(getPostings(terms[0]), rankingType);
             }else{
                 postList = getPostings(terms[0]);
             }
@@ -111,14 +135,14 @@ public class HashedIndex implements Index {
                     if(i > 1) postList = phraseQuery(postList, getPostings(terms[i]), i);
                     break;
                     case (Index.RANKED_QUERY):
-                    if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0])), getPostings(terms[1]));
-                    if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]));
+                    if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0]), rankingType), getPostings(terms[1]), rankingType);
+                    if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]), rankingType);
                     break;
                 }
             }
         }
 
-        if (queryType == Index.RANKED_QUERY){
+        if (queryType == Index.RANKED_QUERY && postList != null){
             postList.sort();
         }
 
@@ -213,41 +237,14 @@ public class HashedIndex implements Index {
     }
 
 
-    private PostingsList rankedQuery(PostingsList pl){
-        PostingsEntry pe;
-        PostingsList postList = new PostingsList();
-        for (int i = 0; i < pl.size(); i++){
-            pe = pl.get(i);
-            pe.score = tf_idfScore(pe, pl);
-            postList.add(pe);
-        }
-
-        
-        return postList;
+    private PostingsList rankedQuery(PostingsList pl, int rankingType){
+        if(pl == null) return null;
+        pl.score(rankingType);
+        return pl;
     }
 
-    private double tf_idfScore (PostingsEntry pe, PostingsList pl){
-        /**
-        * t = query term
-        * d = document
-        * 
-        * df = document frequency = # of documents having the term
-        * tf = term frequency = # of occurences of the term in the document
-        * 
-        * tf_idf(d,t) = tf(d,t)*idf(t)/len(d)
-        * idf(t) =  ln(N/df(t))
-        * where tf(d,t) = [# occurrences of t in d], N = [# documents in the corpus],
-        * df(t) = [# documents in the corpus which contain t], and len(d) = [# words in d]. 
-        */
-        int tf = pe.getOffsets().size();
-        double idf = Math.log(Index.docIDs.size()/pl.size());
-        int len = Index.docLengths.get(Integer.toString(pe.docID));
-
-        return tf*idf/len;
-    }
-
-    private PostingsList rankedQuery(PostingsList p1, PostingsList p2){
-        p2 = rankedQuery(p2);
+    private PostingsList rankedQuery(PostingsList p1, PostingsList p2, int rankingType){
+        p2 = rankedQuery(p2, rankingType);
 
         if(p1 == null || p2 == null){
             return null;
@@ -294,10 +291,7 @@ public class HashedIndex implements Index {
             }
             return postList;
         }
-
     }
-
-
 
     /**
      *  No need for cleanup in a HashedIndex.

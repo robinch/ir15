@@ -1,5 +1,0 @@
-Why are fewer documents generally returned in phrase query mode than in intersection query mode?
-
-Because on intersection query mode the words in the query only needs to exist in the document.
-But in phrase query mode they also need to be in the right order.
-So phrase query will be a subset of intersection query.

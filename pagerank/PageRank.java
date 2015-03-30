@@ -262,6 +262,9 @@ public class PageRank{
 
 	}
 
+	/**
+	*	End-point with random start
+	*/
 	double[] monteCarlo1(int numberOfDocs, int n){
 		double[] docs = new double[numberOfDocs];
 		int nrOfSteps;
@@ -284,6 +287,9 @@ public class PageRank{
 	}
 
 
+	/**
+	* End-point with cyclic start
+	*/
 	double[] monteCarlo2(int numberOfDocs, int m){
 		double[] docs = new double[numberOfDocs];
 		int randomDoc;
@@ -307,7 +313,9 @@ public class PageRank{
 
 	} 
 
-
+	/**
+	* Complete path with cyclic start
+	*/
 	double[] monteCarlo3(int numberOfDocs, int m){
 		double[] docs = new double[numberOfDocs];
 		int randomDoc;
@@ -335,6 +343,9 @@ public class PageRank{
 	}
 
 
+	/**
+	*	Complete path stopping at dangling node, cyclic start
+	*/
 	double[] monteCarlo4(int numberOfDocs, int m){
 		double[] docs = new double[numberOfDocs];
 		int randomDoc;
@@ -361,6 +372,9 @@ public class PageRank{
 	}
 
 
+	/**
+	* Compelte path stopping at dangling node, random start
+	*/
 	double[] monteCarlo5(int numberOfDocs, int n){
 		double[] docs = new double[numberOfDocs];
 		int randomDoc;

@@ -1,0 +1,80 @@
+// 1.4
+1 1840-1989 0
+1 Neighboring_Wiki_Content 0
+1 Northern_California 2
+1 Outdoor_Adventures 3
+1 Pre-2010_Reviews 0
+1 Snow_Sports 3
+2 Cru 0
+2 Davis_Life_Magazine 1
+2 Protests 1
+2 UC_Davis_Crew 3
+2 UC_Davis_Budget_Cuts 1
+3 Bats 2
+3 Central_Coast 3
+3 Northern_California 3
+3 Sonoma_County 3 
+
+// 2.3
+1 DonnaDekker  0
+1 Capital_Ski_%26_Sports_Club 1 // kanske 0 eller 1
+1 Alpine_West 0
+1 Transit_Destinations 0
+1 Canine_Rehabilitation_Unleashed%2C_Inc 0
+1 Pierce_Canyon_Falls_Trail 0
+1 Sacramento_Day_Trippers 0
+1 AMS_Club 0
+1 The_Place 0
+1 Sierra_Nevada_Mountains 1
+1 CherieWilliams 0
+1 EricWu 0
+1 Brian_Hickman 0
+1 MWen 0
+1 ElvinLee
+1 Rumsey 0
+1 DeannaBeals 0
+1 SOS 3
+1 The_Long_Ride 0
+1 Day_on_the_Green 0
+
+2 Crew 3
+2 UC_Davis_Judo_Club 0
+2 Drake_Condominiums 0
+2 RBU 0
+2 Rock_Band_University 0
+2 Sterling_University_Vista 0
+2 UC_Davis_Airport 0
+2 U_Mall 0
+2 University_House_Annex 0
+2 Ski_Team 0
+2 Heritage_House_Apartments 0
+2 Kingston_Apartments 0
+2 UCDSO 0
+2 YONET 0
+2 KatharineHuang 0
+2 Davis_Sailing_Team 0 // might be 1 
+2 UC_Davis_Ski_Team 0 
+2 ASUCD_University_Affairs 0
+2 CSUS 0
+2 CSU_Chico 0
+
+3 Wake_Forest_Drive 1 // skumt borde stå appartment
+3 Yolo_County_Visitors_Bureau 2
+3 Every_15_Minutes 1 // kan vaa 0 eller 1
+3 4th_Street 1 // kan vara 0 det är inte egentliga attractions de pekar på
+3 Clear_Lake 3
+3 Citrus_Heights 2
+3 Yosemite_National_Park 3
+3 The_Flying_Carousel_of_the_Delta_Breeze 3
+3 Sonoma_County 3
+3 Dixon 3
+3 KMAX-TV 0
+3 San_Francisco 3
+3 Lincoln_Highway 0
+3 Whole_Earth_Festival_2005 1
+3 Davis_Visitor%27s_Guide 3
+3 Central_Coast 3
+3 RevChad 0
+3 Davis_Empowerment_%26_Community_Organization 0
+3 ConsciousConsumer 0
+3 Platinum_meets_pavement 0

@@ -1,0 +1,14 @@
+The highest ranked document has the title ”Davis”, while the document ranked 50 has the 
+title ”Interpreting User Statistics”. Does this pagerank ordering seem reasonable? Why?
+
+Yes. The page rank is built on the concepts of links. Having many pages linking to a page gives
+it a higher ranking. Many pages will either link to general pages such as Davis or pages about the wiki
+such as photo request or statistical pages.
+
+They are usually general pages with many links. Or meta pages for the wiki. 
+
+
+Look up the titles of some other documents with high rank. What is the trend with 
+decreasing pagerank?
+
+They get more and more specific.

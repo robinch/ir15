@@ -11,6 +11,7 @@ package ir;
 import java.util.LinkedList;
 import java.io.Serializable;
 import java.util.Collections;
+import java.io.*;
 
 /**
  *   A list of postings for a given word.
@@ -50,6 +51,21 @@ public class PostingsList implements Serializable {
 	}
 
 	public void score(int rankingType){
+		double weight = 0.01;
+		String line;
+		try{
+			BufferedReader br = new BufferedReader(new FileReader("weight.txt"));
+			while((line = br.readLine()) != null){
+				weight = new Double(line);
+			}
+			br.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+			System.out.println("Error! Will use default value:" + weight);
+		}
+
+
 		for(PostingsEntry pe: list){
 			switch(rankingType){
 				case(Index.TF_IDF):
@@ -59,7 +75,7 @@ public class PostingsList implements Serializable {
 				pe.score = pagerankScore(pe);
 				break;
 				case(Index.COMBINATION):
-				pe.score = combinationScore(pe);
+				pe.score = combinationScore(pe, weight);
 				break;
 			}
 		}
@@ -79,11 +95,11 @@ public class PostingsList implements Serializable {
 		return Index.docRanking.get(s);
 	}
 
-	public double combinationScore(PostingsEntry pe){		
-		double a = 0.2; // higher a gives tf_idf more impact, lower gives pr.
+	public double combinationScore(PostingsEntry pe, double weight){
+		// higher weight gives tf_idf more impact, lower gives pr.
 		double tfScore = tf_idfScore(pe);
 		double prScore = pagerankScore(pe);
-		return a*tfScore+(1 - a)*prScore; // THis will be changed
+		return weight*tfScore+(1 - weight)*10*prScore; // THis will be changed
 	}
 
 

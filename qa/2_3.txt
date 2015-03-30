@@ -1,0 +1,40 @@
+precision = tp/(tp+fp)
+How large part of of the documents retrieved are actually relative.
+
+recall = tp/(tp+fn)
+How large part of relevant documents are actually retrieved
+-------------------------
+skiing trip
+
+precision10 = 2/(2+8) = 1/5
+precision20 = 3/(3+17) = 3/20
+
+recall10 = 2/1000
+recall20 = 3/1000
+-------------------------
+
+university rowing team
+precision10 = 1/(1+9) = 1/10
+precision20 = 1/(1+19) = 1/20
+
+recall10 = 1/1000
+recall20 = 1/1000
+-------------------------
+
+tourist attractions
+precision10 = 10/(10+0) = 1
+precision20 = 14/(14+6) = 14/20 = 7/10
+
+recall10 = 10/1000
+recall20 = 14/1000
+
+
+Does ranked retrieval in general give a higher or lower precision, higher or lower recall 
+than unranked retrieval? Why is that?
+
+
+The precision is in general lower in ranked retrieval than in intersection seach.
+The recall is genral higher in ranked retrieval.
+This is due to that ranked fetches all the documents that has at least one of the words (OR).
+While intersection search fetches the documents countaining all the words in the query (AND).
+

@@ -239,7 +239,7 @@ public class HashedIndex implements Index {
 
     private PostingsList rankedQuery(PostingsList pl, int rankingType){
         if(pl == null) return null;
-        pl.score(rankingType);
+        pl.score(rankingType); 
         return pl;
     }
 
@@ -261,9 +261,9 @@ public class HashedIndex implements Index {
             pe1 = p1.get(i);
             pe2 = p2.get(j);
             if(pe1.docID == pe2.docID){
-                PostingsEntry pe = new PostingsEntry(pe1.docID);
-                pe.score = pe1.score + pe2.score;
-                postList.add(pe);               
+                // PostingsEntry pe = new PostingsEntry(pe1.docID);
+                pe1.score = pe1.score + pe2.score;
+                postList.add(pe1);               
                 i++;
                 j++;
             }else if(pe1.docID < pe2.docID){

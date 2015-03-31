@@ -1,0 +1,25 @@
+Question
+Why do we use a union query here, but an intersection query in Assignment 1?
+
+Answer
+There can be words that are not essential in the query.
+Queries like "How do you {thing}" where the how do you part can be ommited but the {thing} is essential.
+
+
+
+The central concept here is the vector model for query-document similarity. You should 
+be able to explain this concept using pen and paper, and discuss how variations in tf 
+representation (such as log(1+tf)) and document length representation (such as 
+Euclidean length, or sqrt(#words)) affect the cosine similarity measure.
+
+
+tf = term frequency
+idf = inverse document frequency
+
+
+tf = #words in this document
+
+idf = ln(N/df), N = #totalNumberOfDocs, df = 
+
+
+

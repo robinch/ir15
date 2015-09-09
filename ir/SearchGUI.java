@@ -27,7 +27,7 @@ import javax.swing.event.*;
 public class SearchGUI extends JFrame {
 
     /**  The indexer creating the search index. */
-    Indexer indexer = new Indexer();
+    Indexer indexer = new Indexer(new HashedIndex());
 
     /**  The query posed by the user, used in search() and relevanceFeedbackSearch() */
     private Query query; 

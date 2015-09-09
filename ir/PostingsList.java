@@ -54,7 +54,7 @@ public class PostingsList implements Serializable {
 		double weight = 0.01;
 		String line;
 		try{
-			BufferedReader br = new BufferedReader(new FileReader("weight.txt"));
+			BufferedReader br = new BufferedReader(new FileReader("ir/weight.txt"));
 			while((line = br.readLine()) != null){
 				weight = new Double(line);
 			}

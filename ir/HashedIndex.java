@@ -73,7 +73,7 @@ public class HashedIndex implements Index {
     public Iterator<String> getDictionary() {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
-	//
+	//  DONE!
         return index.keySet().iterator();
     }
 
@@ -85,7 +85,7 @@ public class HashedIndex implements Index {
     public PostingsList getPostings( String token ) {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
-	// 
+	//  DONE
         return index.get(token);
 
     }
@@ -97,7 +97,7 @@ public class HashedIndex implements Index {
     public PostingsList search( Query query, int queryType, int rankingType, int structureType ) {
 	// 
 	//  REPLACE THE STATEMENT BELOW WITH YOUR CODE
-	//
+	// DONE
         // for (String s: docIDs.keySet()){
         //     System.out.format("Key: %s Value:%s", s, docIDs.get(s));
         

@@ -56,8 +56,8 @@ public class Indexer {
     /**
      *  Initializes the index as a HashedIndex.
      */
-    public Indexer() {
-	index = new HashedIndex();
+    public Indexer(Index index) {
+	this.index = index;
     }
 
 

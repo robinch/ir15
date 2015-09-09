@@ -9,11 +9,15 @@ package ir;
 
 import java.util.LinkedList;
 import java.util.StringTokenizer;
+import java.util.Arrays;
+import java.io.*;
 
 public class Query {
     
     public LinkedList<String> terms = new LinkedList<String>();
     public LinkedList<Double> weights = new LinkedList<Double>();
+    private DocTermFrequencyIndex termFreq;
+    private Indexer termIndexer;
 
     /**
      *  Creates a new empty Query 
@@ -59,6 +63,21 @@ public class Query {
 	//
 	//  YOUR CODE HERE
 	//
+        termFreq = new DocTermFrequencyIndex();
+        indexer = new Indexer(termFreq);
+
+        double a = 1;
+        double b = 0.75;
+
+        for (int i = 0; i < 10; i++ ){
+            if(docIsRelevant[i]) {
+                indexer.processFiles(new File(Index.docIDs.get(Integer.toString(results.get(i).docID)).substring(1)));
+            }
+        }
+        System.out.println(Arrays.toString(docIsRelevant));
+        for (int i = 0; i < terms.size(); i++){
+            System.out.format("%s : %f\n", terms.get(i), weights.get(i));
+        }
     }
 }
 

@@ -16,8 +16,6 @@ public class Query {
     
     public LinkedList<String> terms = new LinkedList<String>();
     public LinkedList<Double> weights = new LinkedList<Double>();
-    private DocTermFrequencyIndex termFreq;
-    private Indexer termIndexer;
 
     /**
      *  Creates a new empty Query 
@@ -63,20 +61,35 @@ public class Query {
 	//
 	//  YOUR CODE HERE
 	//
-        termFreq = new DocTermFrequencyIndex();
-        indexer = new Indexer(termFreq);
+        File f;
+        DocTermFrequencyIndex termFreq = new DocTermFrequencyIndex();
+        Indexer termExpandIndexer = new Indexer(termFreq);
+        int size = 0;
+
 
         double a = 1;
         double b = 0.75;
-
+        // fetch all the terms in the relevant dock and creat a normalized dock index
         for (int i = 0; i < 10; i++ ){
             if(docIsRelevant[i]) {
-                indexer.processFiles(new File(Index.docIDs.get(Integer.toString(results.get(i).docID)).substring(1)));
+                f = new File(Index.docIDs.get(Integer.toString(results.get(i).docID)));
+                System.out.println(f);
+                termExpandIndexer.processFiles(f);
             }
         }
+
+        size = termFreq.getNormTF().size();
         System.out.println(Arrays.toString(docIsRelevant));
         for (int i = 0; i < terms.size(); i++){
             System.out.format("%s : %f\n", terms.get(i), weights.get(i));
+        }
+
+        System.out.println(termFreq.getNormTF().size());
+
+        for(String term: termFreq.getNormTF().keySet()){
+            if(results.getList().contains(term)){
+                System.out.println("HELLO!!!");
+            }
         }
     }
 }

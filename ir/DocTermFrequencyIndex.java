@@ -6,12 +6,12 @@ import java.util.Iterator;
 
 class DocTermFrequencyIndex implements Index {
 
-	private HashMap<String,Double> normTotalTermFreq = new HashMap<String, Double>();
+	private HashMap<String,Double> normTF = new HashMap<String, Double>();
 
 	private HashMap<String, Integer> termFreq = new HashMap<String, Integer>();
 
 	private int lastDoc = -1;
-	private int termsInDoc = 0;
+	private double termsInDoc = 0;
 
 	public void insert( String token, int docID, int offset ){
 
@@ -26,12 +26,12 @@ class DocTermFrequencyIndex implements Index {
 
 				normTermFreq = termFreq.get(term)/termsInDoc;
 
-				if(normTotalTermFreq.containsKey(term)){
-					normTotalTermFreq.put(term, 
-						normTotalTermFreq.get(term) + 
+				if(normTF.containsKey(term)){
+					normTF.put(term, 
+						normTF.get(term) + 
 						normTermFreq);
 				} else {
-					normTotalTermFreq.put(term, normTermFreq);
+					normTF.put(term, normTermFreq);
 				}
 			}
 			lastDoc = docID;
@@ -45,11 +45,12 @@ class DocTermFrequencyIndex implements Index {
 		} else {
 			termFreq.put(token, oldValue++);
 		}
+		termsInDoc++;
 		
 
 	}
 	public Iterator<String> getDictionary(){
-		return normTotalTermFreq.keySet().iterator();
+		return normTF.keySet().iterator();
 	}
 	public PostingsList getPostings( String token ){
     	// Won't need this
@@ -60,8 +61,8 @@ class DocTermFrequencyIndex implements Index {
     	return null;
 	}
 
-	public HashMap<String, Double> getNormTotalTermFreq(){
-		return normTotalTermFreq;
+	public HashMap<String, Double> getNormTF(){
+		return normTF;
 	}
 
     // Won't need this

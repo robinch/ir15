@@ -33,6 +33,7 @@ class DocTermFrequencyIndex implements Index {
 				} else {
 					normTF.put(term, normTermFreq);
 				}
+				System.out.println("normTermFreq: " + normTermFreq);
 			}
 			lastDoc = docID;
 			termsInDoc = 0;

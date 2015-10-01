@@ -75,11 +75,11 @@ public class Query {
         Indexer termExpandIndexer = new Indexer(termFreqIndex);
         HashMap<String,Double> termFreq = termFreqIndex.getNormTF();
 
-        // #terms in the original query and the expander
+        // #terms in the original query (a) and the expander (b)
         int aSize = terms.size();
         int bSize = 0;
         
-        // fetch all the terms in the relevant dock and creat a normalized dock index
+        // fetch all the terms in the relevant doc and create a normalized doc index
         for (int i = 0; i < 10; i++ ){
             if(docIsRelevant[i]) {
                 f = new File(Index.docIDs.get(Integer.toString(results.get(i).docID)));
@@ -89,6 +89,12 @@ public class Query {
         }
 
         bSize = termFreq.size();
+
+        System.out.println("TERMFREQ! (norm)");
+        System.out.println("TERMFREQ SIZE: " + termFreq.size());
+        for(String term : termFreq.keySet()){
+            System.out.format("%s : %f, ", term, termFreq.get(term));
+        }
 
         // Just for debuging
         System.out.println(Arrays.toString(docIsRelevant));
@@ -101,17 +107,13 @@ public class Query {
 
         System.out.format("Size of expanding query: %d\n",termFreq.size());
 
-        for(String term: termFreq.keySet()){
-            if(terms.contains(term)){
-                System.out.println("HELLO!!!");
-            }
-        }
+        
         //----------------------
 
         LinkedList<String> expandedTerms = new LinkedList();
         LinkedList<Double> expandedWeights = new LinkedList();
 
-        double aWeight = 0;
+        double aWeight = 0.0;
         Double bWeight = 0.0;
         double newScore = 0;
         String t = "";
@@ -119,13 +121,13 @@ public class Query {
         System.out.println("weights size:" + weights.size());
 
 
-
+/*
         System.out.println("all weights");
         for(String term : termFreq.keySet()){
-            System.out.println(termFreq.get(term));
+            System.out.format("%s: %f",term, termFreq.get(term));
         }
 
-
+        // Rocchios Algorithm
         System.out.println("Old terms");
         // Those terms that already exists
         while(!terms.isEmpty()){
@@ -133,7 +135,7 @@ public class Query {
             System.out.println(t);
             aWeight = weights.pop();
             System.out.println("aWeight: " + aWeight);
-            System.out.println("termFreqSize" + termFreq.size());
+            System.out.println("termFreqSize: " + termFreq.size());
             bWeight = termFreq.remove(t);
             bWeight = bWeight == null? 0 : bWeight;
             System.out.println("bWeight: " + bWeight);
@@ -144,7 +146,7 @@ public class Query {
             }
         }
 
-
+        // Those that were not in the original query
         System.out.println("expand terms");
         for(String term: termFreq.keySet()){
             bWeight = termFreq.get(term);     
@@ -163,6 +165,7 @@ public class Query {
 
         System.out.println("Expanded query!");
         System.out.println(Arrays.toString(terms.toArray()));
+        */
     }
 }
 

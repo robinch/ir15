@@ -11,6 +11,7 @@ package ir;
 import java.util.LinkedList;
 import java.io.Serializable;
 import java.util.Collections;
+import java.util.Arrays;
 import java.io.*;
 
 /**
@@ -91,7 +92,12 @@ public class PostingsList implements Serializable {
 	public double pagerankScore(PostingsEntry pe){	
 		String s = Index.docIDs.get(Integer.toString(pe.docID));
 		s = s.replace("./davisWiki/", "");
+		// used find . -type f | perl -ne 'print $1 if m/\.([^.\/]+)$/' | sort -u
+		// to see what file extension existed
+		// taken from https://stackoverflow.com/questions/1842254/how-can-i-find-all-of-the-distinct-file-extensions-in-a-folder-hierarchy
 		s = s.replace(".f", "");
+		s = s.replace(".html", "");
+		s = s.replace(".txt", "");
 		return Index.docRanking.get(s);
 	}
 

@@ -51,13 +51,21 @@ public class PostingsList implements Serializable {
 		
 	}
 
-	public void score(int rankingType){
+	public void add(PostingsEntry pe){
+		list.add(pe);
+	}
+
+	// Reads from weights file
+	public void score(int rankingType, double w){
 		double weight = 0.01;
 		String line;
 		try{
 			BufferedReader br = new BufferedReader(new FileReader("ir/weight.txt"));
-			while((line = br.readLine()) != null){
-				weight = new Double(line);
+			if((line = br.readLine()) != null){
+				if((line = br.readLine()) != null){
+					String[] s = line.split("\t");
+					weight = new Double(s[0]);
+				}
 			}
 			br.close();
 		}
@@ -70,26 +78,26 @@ public class PostingsList implements Serializable {
 		for(PostingsEntry pe: list){
 			switch(rankingType){
 				case(Index.TF_IDF):
-				pe.score = tf_idfScore(pe);
+				pe.score = tf_idfScore(pe, w);
 				break;
 				case(Index.PAGERANK):
-				pe.score = pagerankScore(pe);
+				pe.score = pagerankScore(pe, w);
 				break;
 				case(Index.COMBINATION):
-				pe.score = combinationScore(pe, weight);
+				pe.score = combinationScore(pe, weight, w);
 				break;
 			}
 		}
 	}
 
-	public double tf_idfScore(PostingsEntry pe){
+	public double tf_idfScore(PostingsEntry pe, double weight){
 		int tf = pe.getOffsets().size();
 		double idf = Math.log(Index.docIDs.size()/size());
 		int len = Index.docLengths.get(Integer.toString(pe.docID));
-		return tf*idf/len;
+		return weight*tf*idf/len;
 	}
 
-	public double pagerankScore(PostingsEntry pe){	
+	public double pagerankScore(PostingsEntry pe, double weight){	
 		String s = Index.docIDs.get(Integer.toString(pe.docID));
 		s = s.replace("./davisWiki/", "");
 		// used find . -type f | perl -ne 'print $1 if m/\.([^.\/]+)$/' | sort -u
@@ -98,23 +106,26 @@ public class PostingsList implements Serializable {
 		s = s.replace(".f", "");
 		s = s.replace(".html", "");
 		s = s.replace(".txt", "");
-		return Index.docRanking.get(s);
+		return weight*Index.docRanking.get(s);
 	}
 
-	public double combinationScore(PostingsEntry pe, double weight){
+	public double combinationScore(PostingsEntry pe, double weight, double w){
 		// higher weight gives tf_idf more impact, lower gives pr.
-		double tfScore = tf_idfScore(pe);
-		double prScore = pagerankScore(pe);
+		double tfScore = tf_idfScore(pe, w);
+		double prScore = pagerankScore(pe, w);
 		return weight*tfScore+(1 - weight)*10*prScore; // THis will be changed
-	}
-
-
-	public void add(PostingsEntry pe){
-		list.add(pe);
 	}
 
 	public void sort(){
 		Collections.sort(list);
+	}
+
+	public PostingsList copy(){
+		PostingsList copy = new PostingsList();
+		for(int i = 0; i < list.size(); i++){
+			copy.add(list.get(i).copy());
+		}
+		return copy;
 	}
 }
 

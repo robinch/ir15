@@ -63,10 +63,12 @@ public class Query {
 	//  YOUR CODE HERE
 	//
 
-        // Can be adjusted
-        double a = 1;
-        double b = 0.75;
-        double threshold = 7e-7;
+        // get
+        double[] w = getWeights();
+        double a = w[0];
+        double b = w[1];
+        double threshold = w[2];
+        System.out.format("Weights! a:%.3f, b:%.3f, threshold:%.3f\n" , w[0], w[1],w[2]);
         //------------
 
         File f;
@@ -83,32 +85,18 @@ public class Query {
         for (int i = 0; i < 10; i++ ){
             if(docIsRelevant[i]) {
                 f = new File(Index.docIDs.get(Integer.toString(results.get(i).docID)));
-                System.out.println(f);
-                termExpandIndexer.processFiles(f);
+                //System.out.println(f);
+                termExpandIndexer.processFiles2(f);
+                bSize++;
             }
         }
 
-        bSize = termFreq.size();
+        if(bSize == 0) return;
 
-        System.out.println("TERMFREQ! (norm)");
-        System.out.println("TERMFREQ SIZE: " + termFreq.size());
-        for(String term : termFreq.keySet()){
-            System.out.format("%s : %f, ", term, termFreq.get(term));
+        //Normalize query
+        for(int i = 0; i< aSize; i++){
+            weights.add(i, weights.get(i)/aSize);
         }
-
-        // Just for debuging
-        System.out.println(Arrays.toString(docIsRelevant));
-        for (int i = 0; i < terms.size(); i++){
-            System.out.format("%s : %f, ", terms.get(i), weights.get(i));
-        }
-
-
-        System.out.println();
-
-        System.out.format("Size of expanding query: %d\n",termFreq.size());
-
-        
-        //----------------------
 
         LinkedList<String> expandedTerms = new LinkedList();
         LinkedList<Double> expandedWeights = new LinkedList();
@@ -118,27 +106,13 @@ public class Query {
         double newScore = 0;
         String t = "";
 
-        System.out.println("weights size:" + weights.size());
-
-
-/*
-        System.out.println("all weights");
-        for(String term : termFreq.keySet()){
-            System.out.format("%s: %f",term, termFreq.get(term));
-        }
-
         // Rocchios Algorithm
-        System.out.println("Old terms");
         // Those terms that already exists
         while(!terms.isEmpty()){
             t = terms.pop();
-            System.out.println(t);
             aWeight = weights.pop();
-            System.out.println("aWeight: " + aWeight);
-            System.out.println("termFreqSize: " + termFreq.size());
             bWeight = termFreq.remove(t);
             bWeight = bWeight == null? 0 : bWeight;
-            System.out.println("bWeight: " + bWeight);
             newScore = a*aWeight/aSize + b*bWeight/bSize;
             if(newScore > threshold){
                 expandedTerms.add(t);
@@ -147,25 +121,50 @@ public class Query {
         }
 
         // Those that were not in the original query
-        System.out.println("expand terms");
         for(String term: termFreq.keySet()){
             bWeight = termFreq.get(term);     
             newScore = b*bWeight/bSize;
-            System.out.println("newscore: " + newScore);
             if(newScore > threshold) {
                 expandedTerms.add(term);
                 expandedWeights.add(newScore);
             }
         }
-
+        
+        // Replace the original query and weight with the expanded ones.
         terms = expandedTerms;
-        weights = expandedWeights;
+        weights = expandedWeights;    
+    }
 
-        System.out.println("First doc length: " + Index.docLengths.get("4"));
-
-        System.out.println("Expanded query!");
-        System.out.println(Arrays.toString(terms.toArray()));
-        */
+    /**
+    *   Returns weights set in weight.txt
+    *   if file is not found return default
+    *   a-weight = 1,  b-weight = 0.75, threshold = 0.01
+    *   index 0 gives a-weight
+    *   index 1 gives b-weight
+    *   index 2 gives threshold
+    */
+    private double[] getWeights(){
+        double a = 1;
+        double b = 0.75;
+        double threshold = 0.01;
+        String line;
+        try{
+            BufferedReader br = new BufferedReader(new FileReader("ir/weight.txt"));
+            if((line = br.readLine()) != null){
+                if((line = br.readLine()) != null){
+                    String[] s = line.split("\t");
+                    a = Double.parseDouble(s[1].trim());
+                    b = Double.parseDouble(s[2].trim());
+                    threshold = Double.parseDouble(s[3].trim());
+                }
+            }
+            br.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            System.out.format("Error! Will use default values a:%f , b:%f\n", a,b);
+        }
+        return new double[]{a,b,threshold};
     }
 }
 

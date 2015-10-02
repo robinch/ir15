@@ -19,36 +19,36 @@ class DocTermFrequencyIndex implements Index {
 		// and update last doc, reset termsInDoc
 		if(docID != lastDoc) {
 
-			double normTermFreq = 0.0;
+			Double val = 0.0;
 
 			for (String term : termFreq.keySet()){
 
-				normTermFreq = termFreq.get(term)/termsInDoc;
+				val = termFreq.get(term).doubleValue()/termsInDoc;
 
 				if(normTF.containsKey(term)){
-					normTF.put(term, 
-						normTF.get(term) + 
-						normTermFreq);
+					val += normTF.get(term);
+					normTF.put(term, val);
 				} else {
-					normTF.put(term, normTermFreq);
+					normTF.put(term, val);
 				}
 				//System.out.println("normTermFreq: " + normTermFreq);
 			}
 			lastDoc = docID;
 			termsInDoc = 0;
-			System.out.println("START REAL TERMFREQ!!!!");
+			/*System.out.println("START REAL TERMFREQ!!!!");
 			for(String term: termFreq.keySet()){
 				System.out.format("%s : %d\n", term, termFreq.get(term));
 			}
-			System.out.println("END REAL TERMFREQ!!!!");
+			System.out.println("END REAL TERMFREQ!!!!");*/
 			termFreq = new HashMap<String, Integer>();
 		}
 
-		Integer oldValue = termFreq.get(token);
-		if(oldValue == null){
+		Integer value = termFreq.get(token);
+		if(value == null){
 			termFreq.put(token, 1);
 		} else {
-			termFreq.put(token, oldValue++);
+			value += 1;
+			termFreq.put(token,value);
 		}
 		termsInDoc++;
 		

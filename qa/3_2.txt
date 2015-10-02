@@ -1,0 +1,31 @@
+First we need a baseline to compare to.
+
+Do a combined, ranked search on these following queries.
+
+skiing trip
+university rowing team
+tourist attractions
+
+Write down the recall and precision at 10 for each query.
+
+Now choose 2 relevant documents and remember which you chose.
+
+We will now see how the recall and precision are effected by "a" and "b"
+
+We will use the default values, lower values and higher values.
+a = {0.6, 1, 1.3}, b = {0.5, 7.5, 1.3}. (middle values are the default).
+And use the same 2 relevant documents.
+
+And now do new seaches with the following values:
+a = 0.6, try all "b" values
+a = 1, try all "b" values
+a = 1.3, try all "b" values
+
+There will be 9 searches all together
+
+Write down the recall and precision at 10 for all these cases.
+Now create one graph for each "a" value and see how the recall and precision at 10 changes depending on the "b" value
+
+Compare these to the baseline.
+
+Anything interesting?

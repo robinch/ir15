@@ -102,6 +102,8 @@ public class HashedIndex implements Index {
         //     System.out.format("Key: %s Value:%s", s, docIDs.get(s));
         
         // }
+        if (query.size() == 0) return null;
+
         String[] terms = new String[query.size()];
         String s = "";
         for(int i = 0; i < query.size(); i++ ){
@@ -110,16 +112,17 @@ public class HashedIndex implements Index {
             terms[i] = s;
         }
 
-        
+        System.out.println("Query:" + Arrays.toString(terms));
         
 
         PostingsList postList = new PostingsList();
 
         
         if (terms.length == 1){
+            if(getPostings(terms[0]) == null) return null;
             if(queryType == Index.RANKED_QUERY)
             {
-                postList = rankedQuery(getPostings(terms[0]), rankingType);
+                postList = rankedQuery(getPostings(terms[0]), rankingType, query.weights.get(0));
             }else{
                 postList = getPostings(terms[0]);
             }
@@ -135,8 +138,8 @@ public class HashedIndex implements Index {
                     if(i > 1) postList = phraseQuery(postList, getPostings(terms[i]), i);
                     break;
                     case (Index.RANKED_QUERY):
-                    if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0]), rankingType), getPostings(terms[1]), rankingType);
-                    if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]), rankingType);
+                    if(i == 0) postList = rankedQuery(rankedQuery(getPostings(terms[0]), rankingType, query.weights.get(0)), getPostings(terms[1]), rankingType, query.weights.get(1));
+                    if(i > 1) postList = rankedQuery(postList, getPostings(terms[i]), rankingType, query.weights.get(i));
                     break;
                 }
             }
@@ -237,14 +240,15 @@ public class HashedIndex implements Index {
     }
 
 
-    private PostingsList rankedQuery(PostingsList pl, int rankingType){
+    private PostingsList rankedQuery(PostingsList pl, int rankingType, double weight){
         if(pl == null) return null;
-        pl.score(rankingType); 
-        return pl;
+        PostingsList postList = pl.copy();
+        postList.score(rankingType, weight); 
+        return postList;
     }
 
-    private PostingsList rankedQuery(PostingsList p1, PostingsList p2, int rankingType){
-        p2 = rankedQuery(p2, rankingType);
+    private PostingsList rankedQuery(PostingsList p1, PostingsList p2, int rankingType, double weight){
+        p2 = rankedQuery(p2, rankingType, weight);
 
         if(p1 == null || p2 == null){
             return null;

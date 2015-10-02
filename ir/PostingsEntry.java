@@ -47,6 +47,15 @@ public class PostingsEntry implements Comparable<PostingsEntry>, Serializable {
             offsets.add(off);
         }
     }
+
+    public PostingsEntry copy(){
+        PostingsEntry copy = new PostingsEntry(docID);
+        for(int i = 0; i < offsets.size(); i++){
+            copy.add(offsets.get(i));
+        }
+        copy.score = score;
+        return copy;
+    }
 }
 
 
